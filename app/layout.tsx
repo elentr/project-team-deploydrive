@@ -1,23 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Nunito_Sans, Sora } from "next/font/google";
+import "modern-normalize/modern-normalize.css";
 import "./globals.css";
-// import TanStackProvider from "../components/TanStackProvider/TanStackProvider";
+import TanStackProvider from "../components/TanStackProvider/TanStackProvider";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const nunito = Nunito_Sans({
+  variable: "--font-nunito-sans",
+  subsets: ["latin", "cyrillic"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sora = Sora({
+  variable: "--font-sora-sans",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   title: "Подорожники",
-  description: "About travels adn interesting places",
+  description: "Надихніться подорожами інших та поділіться своєю історією.",
 };
 
 export default function RootLayout({
@@ -27,12 +28,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {/* <TanStackProvider> */}
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        {/* </TanStackProvider> */}
+      <body className={`${nunito.variable} ${sora.variable}`}>
+        <TanStackProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </TanStackProvider>
       </body>
     </html>
   );
