@@ -17,7 +17,7 @@ interface IProp {
 }
 
 export default function Header({ type = "primary" }: IProp) {
-  const [isAuth, setIsAuth] = useState(true);
+  const [isAuth, setIsAuth] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
