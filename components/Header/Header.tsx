@@ -7,17 +7,17 @@ import Link from 'next/link';
 import cn from "classnames";
 import styles from './Header.module.css';
 import Image from 'next/image';
-import BurgerMenuImg from "../../public/icons/burgermenu.svg"
-import CloseButtonImg from "../../public/icons/closebutton.svg"
-import AvatarIcon from "../../public/icons/avatar.svg";
-import LogoutIcon from "../../public/icons/logout.svg";
+import BurgerMenuImg from "@/public/icons/burgermenu.svg"
+import CloseButtonImg from "@/public/icons/closebutton.svg"
+import AvatarIcon from "@/public/icons/avatar.svg";
+import LogoutIcon from "@/public/icons/logout.svg";
+import { usePathname } from 'next/navigation';
 
-interface IProp {
-  type?: "primary" | "secondary";
-}
+export default function Header() {
+  const pathname = usePathname();
+  const type = pathname === "/" ? "secondary" : "primary";
 
-export default function Header({ type = "primary" }: IProp) {
-  const [isAuth, setIsAuth] = useState(true);
+  const [isAuth, setIsAuth] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
@@ -72,7 +72,6 @@ export default function Header({ type = "primary" }: IProp) {
                     <LogoutIcon 
                       width={18} 
                       height={19}
-                      className={cn(type === "primary" ? styles.menuPrimary : styles.menuSecondary)} 
                       onClick={(e: { stopPropagation: () => void; }) => {
                         e.stopPropagation(); // блокирует клик по всей кнопке
                         alert("Confirm logout"); //логика выхода

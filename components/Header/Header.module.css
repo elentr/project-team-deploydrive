@@ -130,6 +130,10 @@
   padding-right: 8px;
 }
 
+.logoutBtn svg {
+  fill: #000000;
+}
+
 .logoutBtn span::before {
   content: "";
   position: absolute;
@@ -315,6 +319,10 @@
 
   .secondary .logoutBtn {
     color: #f7f9ff;
+  }
+
+  .secondary .logoutBtn svg {
+    fill: #ffffff;
   }
 
   .secondary .btn_1 {
