@@ -131,6 +131,22 @@
   gap: 24px;
 }
 
+.cancelBtnError {
+  width: 203px;
+  height: 48px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--Color-Scheme-2-Border, rgba(0, 0, 0, 0.15));
+  background: var(--Opacity-Neutral-Darkest-5, rgba(0, 0, 0, 0.05));
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  cursor: pointer;
+  color: #000;
+  transition: background 0.2s ease;
+}
+
 .cancelBtnExit {
   width: 203px;
   height: 48px;
@@ -144,6 +160,7 @@
   line-height: 150%;
   cursor: pointer;
   color: #000;
+  transition: background 0.2s ease;
 }
 
 .confirmBtnExit {
@@ -159,27 +176,15 @@
   font-size: 16px;
   line-height: 150%;
   cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .formError {
   width: 430px;
   height: 48px;
   gap: 24px;
-}
-
-.cancelBtnError {
-  width: 203px;
-  height: 48px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--Color-Scheme-2-Border, rgba(0, 0, 0, 0.15));
-  background: var(--Opacity-Neutral-Darkest-5, rgba(0, 0, 0, 0.05));
-  font-family: "Nunito Sans", sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 150%;
-  cursor: pointer;
-  color: #000;
 }
 
 .confirmBtnError {
@@ -195,6 +200,9 @@
   font-size: 16px;
   line-height: 150%;
   cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .cancelBtn:hover {
@@ -265,6 +273,48 @@
   background-color: #333333;
 }
 
+.confirmBtnExit:active,
+.confirmBtnError:active {
+  background: #254bba; /* темніший відтінок */
+  border-color: #254bba;
+}
+
+.confirmBtnExit:disabled,
+.confirmBtnError:disabled {
+  background: #c8d1fa;
+  border-color: #c8d1fa;
+  color: #ffffffb3;
+  cursor: not-allowed;
+}
+
+.cancelBtnExit:active,
+.cancelBtnError:active {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.cancelBtnExit:hover,
+.cancelBtnError:hover,
+.cancelBtnExit:focus-visible,
+.cancelBtnError:focus-visible {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.confirmBtnExit:hover,
+.confirmBtnError:hover,
+.confirmBtnExit:focus-visible,
+.confirmBtnError:focus-visible {
+  background: #6c8cff;
+  border-color: #6c8cff;
+}
+
+.cancelBtnExit:disabled,
+.cancelBtnError:disabled {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.3);
+  cursor: not-allowed;
+}
+
 /* 💻 Планшет */
 @media (min-width: 376px) and (max-width: 768px) {
   .backdrop {
@@ -287,6 +337,11 @@
     align-items: center;
     gap: 24px;
     opacity: 1;
+  }
+
+  .modalExit,
+  .modalError {
+    padding: 64px 32px;
   }
 
   .contactModalExit,

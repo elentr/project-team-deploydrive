@@ -29,6 +29,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onCancel]);
 
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
+
   // Закриття по кліку на бекдроп
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
