@@ -1,0 +1,339 @@
+/* components/Header/Header.module.css */
+
+.header {
+  width: 100%;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  background-color: #f7f9ff;
+  position: relative;
+  z-index: 10;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-family: var(--font-sora-sans), sans-serif;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: #000;
+}
+
+.burger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 11;
+}
+
+.menuPrimary {
+  fill: #000000;
+  stroke: #000000;  
+}
+
+.menuSecondary {
+    fill: #ffffff;   
+    stroke: #ffffff;  
+}
+
+.nav {
+  margin: 0 auto;
+  position: fixed;
+  top: 72px;
+  left: 100%;
+  width: 100%;
+  height: 100vh;
+  background-color: #f7f9ff;
+  display: flex;
+  justify-content: center;
+  transition: left 0.3s ease;
+}
+
+.nav.open {
+  left: 0;
+}
+
+.list {
+  padding: 16px 20px 0 20px;
+  max-width: 375px;
+  width: 100%;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.navItem {
+  width: 100%;
+  font-weight: 400;
+  font-size: 16px;
+  color: #000;
+  transition: color 0.2s;
+}
+
+.navItem a {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.navItem:hover {
+  color: #4169e1;
+}
+
+.authBtns,
+.authUser {
+  width: 100%;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ---------- Logout ---------- */
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  box-shadow: none;
+  outline: none;
+  border: none;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #000;
+}
+
+.logoutBtn span {
+  position: relative;
+  padding-right: 8px;
+}
+
+.logoutBtn span::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn_2 {
+  max-width: 335px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 4px 10px;
+  width: 100%;
+  min-height: 32px;
+  background-color: rgba(0, 0, 0, 0.05);
+  font-weight: 500;
+  font-size: 16px;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn_2:hover,
+.btn_2:focus {
+  background-color: #4169e1;
+  color: #ffffff;
+}
+
+.btn_2:active {
+  background-color:  #131f43;
+}
+
+.btn_1 {
+  max-width: 335px;
+  border: 1px solid #4169e1;
+  border-radius: 8px;
+  padding: 4px 10px;
+  width: 100%;
+  min-height: 32px;
+  background-color: #4169e1;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn_1:hover,
+.btn_1:focus {
+  background-color: #e8eeff;
+  color: #131f43;
+}
+
+.btn_1:active {
+  background-color: #7a96ea;
+  color: #131f43;
+}
+
+
+.logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.historyBtnTablet {
+  display: none;
+  margin-left: auto;
+  max-width: 184px;
+}
+
+/* ---------- Secondary theme ---------- */
+
+.secondary.header {
+  background-color: transparent;
+}
+
+.secondary .logo {
+  color: #ffffff;
+}
+
+.secondary .historyBtnTablet {
+  color: #000000;
+  background-color: #ffffff;
+  border-color: #ffffff;
+}
+
+.secondary .historyBtnTablet:hover,
+.secondary .historyBtnTablet:focus {
+  color: #ffffff;
+  background-color: #7f7f7f;
+}
+
+.secondary .historyBtnTablet:active {
+  background-color: #4c4c4c;
+}
+
+@media (min-width: 768px) {
+  .historyBtnTablet {
+    display: flex;
+  }
+
+  .historyBtn {
+    display: none;
+  }
+}
+
+@media (min-width: 1440px) {
+  .nav {
+    position: static;
+    height: auto;
+    width: auto;
+    background: transparent;
+    display: flex;
+    margin: 0;
+  }
+
+  .list {
+    padding: 0;
+    max-width: none;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .navItem a,
+  .btn_1,
+  .btn_2 {
+    font-size: 18px;
+    min-height: 35px;
+  }
+
+  .burger {
+    display: none;
+  }
+
+  .historyBtnTablet {
+    display: none;
+  }
+
+  .historyBtn {
+    display: flex;
+    white-space: nowrap;
+  }
+
+  .authBtns,
+  .authUser {
+    margin-top: 0;
+    margin-left: 16px;
+    flex-direction: row;
+  }
+
+  .logoutBtn {
+    min-width: max-content;
+    font-size: 16px;
+  }
+
+  .secondary .navItem {
+    color: #ffffff;
+  }
+
+  .secondary .navItem:hover {
+    color: #4169e1;
+  }
+
+  .secondary .logoutBtn {
+    color: #f7f9ff;
+  }
+
+  .secondary .btn_1 {
+    color: #000000;
+    background-color: #ffffff;
+    border-color: #ffffff;
+  }
+
+  .secondary .btn_1:hover,
+  .secondary .btn_1:focus {
+    color: #ffffff;
+    background-color: #7f7f7f;
+  }
+
+  .secondary .btn_1:active {
+    background-color: #4c4c4c;
+  }
+
+  .secondary .btn_2 {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0);
+  }
+
+
+
+  .secondary .btn_2:hover,
+  .secondary .btn_2:focus {
+    color: #000000;
+    background-color: #e8eeff;
+    border-color: rgba(255, 255, 255, 0);
+  }
+
+  .secondary .btn_2:active{
+    background-color: #7a96ea;
+  }
+}
