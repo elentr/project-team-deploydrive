@@ -30,10 +30,17 @@
 }
 
 .burger {
-  background: none;
-  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 4px;
   cursor: pointer;
   z-index: 11;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .menuPrimary {
@@ -229,6 +236,14 @@
 
 .secondary .historyBtnTablet:active {
   background-color: #4c4c4c;
+}
+
+.secondary .burger {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0);
+  border-radius: 8px;
+  padding: 4px;
+  cursor: pointer;
 }
 
 @media (min-width: 768px) {
