@@ -277,6 +277,7 @@
 .confirmBtnError:active {
   background: #254bba; /* темніший відтінок */
   border-color: #254bba;
+  color: #000;
 }
 
 .confirmBtnExit:disabled,
@@ -289,22 +290,27 @@
 
 .cancelBtnExit:active,
 .cancelBtnError:active {
-  background: rgba(0, 0, 0, 0.25);
+  background: #254bba;
+  border-color: #254bba;
+  color: #fff;
 }
 
 .cancelBtnExit:hover,
 .cancelBtnError:hover,
 .cancelBtnExit:focus-visible,
 .cancelBtnError:focus-visible {
-  background: rgba(0, 0, 0, 0.1);
+  background: #4169e1;
+  border-color: #4169e1;
+  color: #fff;
 }
 
 .confirmBtnExit:hover,
 .confirmBtnError:hover,
 .confirmBtnExit:focus-visible,
 .confirmBtnError:focus-visible {
-  background: #6c8cff;
-  border-color: #6c8cff;
+  background: #e8f0ff; /* світло-блакитний фон */
+  border: 1px solid #4169e1; /* синя обводка */
+  color: #000;
 }
 
 .cancelBtnExit:disabled,
