@@ -5,6 +5,7 @@ import "./globals.css";
 import TanStackProvider from "../components/TanStackProvider/TanStackProvider";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
+import TravellersList from "@/components/TravellersList/TravellersList";
 
 const nunito = Nunito_Sans({
   variable: "--font-nunito-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
         <TanStackProvider>
           <Header />
           <main>{children}</main>
+          <TravellersList/>
           <Footer />
         </TanStackProvider>
       </body>
