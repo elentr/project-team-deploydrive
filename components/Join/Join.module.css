@@ -1,0 +1,115 @@
+.section {
+    padding-top: 32px;
+    padding-bottom: 32px;
+    justify-content: center;
+    background-color: #ffffff;
+  }
+  
+  
+  /* Фоновое изображение */
+  .imageWrapper {
+    position: relative;
+    width: 100%;
+    background-image: url("/images/join_mobaile.webp");
+    background-size: cover;
+    background-position: center;
+    border-radius: 16px;
+  }
+  
+  
+  /* Контент поверх */
+  .content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    max-width: 420px;
+    color: #ffffff;
+    text-align: left;
+  }
+  
+  .title {
+    font-family: var(--font-sora-sans), sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+  
+  .text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #eaeaea;
+    margin-bottom: 24px;
+  }
+  
+  .button {
+    background-color: #4169e1;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 12px;
+    border: 1px solid #4169e1;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .button:hover {
+    background-color: #2f55c2;
+  }
+  
+  @media (min-width: 768px) {
+    .imageWrapper {
+        background-image: url("/images/join_tablet.webp");
+      }
+    
+    .content {
+      max-width: 617px;
+      padding: 32px;
+    }
+  
+    .title {
+      font-size: 32px;
+    }
+  
+  
+    .button {
+      font-size: 18px;
+      width: max-content;
+    }
+  }
+  
+  @media (min-width: 1440px) {
+    .imageWrapper {
+        background-image: url("/images/join_descktop.webp");
+      min-height: 400px;
+      border-radius: 24px;
+    }
+  
+    .content {
+      padding: 78px 64px;
+    }
+  
+    .title {
+      font-size: 48px;
+      margin-bottom: 24px;
+    }
+  
+    .text {
+      font-size: 20px;
+    }
+  
+    .button {
+      font-size: 18px;
+    
+    }
+  }
+  
+  
