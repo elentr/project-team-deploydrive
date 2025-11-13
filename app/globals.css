@@ -1,5 +1,7 @@
+@import url("./stylesVar.css");
+
 :root {
-  --background: #ffffff;
+  --background: var(--color-scheme-2-background);
   --foreground: #171717;
 }
 
