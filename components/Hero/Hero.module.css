@@ -1,0 +1,115 @@
+.hero {
+    position: relative;
+    width: 100%;
+    height: max(500px, 100vh);
+    background-image: url('/images/hero_mobile.webp');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    overflow: hidden;
+  }
+  
+  /* Полупрозрачная тёмная подложка */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+  }
+  
+  /* Контент по центру */
+  .content {
+    position: relative;
+    z-index: 2;
+    padding-top: 90px;
+    padding-bottom: 90px; 
+  }
+  
+  /* Заголовок */
+  .title {
+    font-family: var(--font-sora-sans), sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  
+  /* Подзаголовок */
+  .text {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    margin-bottom: 32px;
+    color: #f0f0f0;
+  }
+  
+  /* Кнопка */
+  .button {
+    display: inline-block;
+    background-color: #4169e1;
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 16px;
+    border: 1px solid #4169e1;
+    border-radius: 8px;
+    padding: 5px 12px;
+    text-decoration: none;
+    text-align: center;
+    width: 100%;
+    transition: background 0.3s ease;
+  }
+  
+  .button:hover {
+    background-color: #3157c2;
+  }
+  
+  /* 🔹 Адаптация для планшета */
+  @media (min-width: 768px) {
+    .hero {
+        background-image: url('/images/hero_tablet.webp');
+    }
+
+    .content {
+      padding-top: 160px;
+    }
+    
+    .title {
+        font-size: 48px;
+        width: 612px;
+    }
+  
+    .text {
+        font-size: 16px;
+    }
+  
+    .button {
+      width: max-content;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .hero {
+        background-image: url('/images/hero_descktop.webp');
+    }
+    .content {
+      padding-top: 200px;
+      max-width: 759px;
+    }
+    
+    .title {
+        font-size: 56px;
+    }
+    .text {
+        font-size: 20px;
+    }
+    .button{
+        font-size: 18px;
+        padding: 6px 12px;
+        width: 126px;
+    }
+  }
+  

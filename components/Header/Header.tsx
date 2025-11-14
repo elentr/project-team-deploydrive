@@ -7,18 +7,32 @@ import Link from 'next/link';
 import cn from "classnames";
 import styles from './Header.module.css';
 import Image from 'next/image';
-import BurgerMenuImg from "@/public/icons/burgermenu.svg"
-import CloseButtonImg from "@/public/icons/closebutton.svg"
-import AvatarIcon from "@/public/icons/avatar.svg";
-import LogoutIcon from "@/public/icons/logout.svg";
 import { usePathname } from 'next/navigation';
+import ConfirmModal from '../ConfirmModal/ConfirmModal';
+import Icon from '../Icon/Icon';
 
-export default function Header() {
+interface User {
+  name: string;
+  avatarUrl?: string | null;
+}
+
+export default function Header () {
   const pathname = usePathname();
   const type = pathname === "/" ? "secondary" : "primary";
 
-  const [isAuth, setIsAuth] = useState(false);
+  const cleanPath = pathname.split("?")[0];
+  const authPage = ["/auth/login", "/auth/register"].includes(cleanPath);
+
+    // временная авторизация
+    const [isAuth, setIsAuth] = useState(false);
+    const [user] = useState<User>({
+      name: "Імʼя",
+      avatarUrl: null,
+    });
+    
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
   const closeMenu = () => setMenuOpen(false);
@@ -29,16 +43,20 @@ export default function Header() {
   }, [menuOpen]);
 
   return (
-    <header className={cn(styles.header, type === "secondary" && styles.secondary)}>
+    <header className={cn(
+      styles.header, 
+      type === "secondary" ? styles.secondary : styles.primary,
+      menuOpen && styles.primary, menuOpen && styles.open
+      )}>
       <div className={cn(styles.container, "container")}>
         {/* Логотип */}
         <Link href="/" className={styles.logo}>
-          <Image src="/icons/companylogo.svg" alt="Logo" width={23} height={23} />
+          <Icon name="icon-logo_plant"  width={23} height={23} />
           Подорожники
         </Link>
 
         {/* Навигация */}
-        <nav className={`${styles.nav} ${menuOpen ? styles.open : ""}`}>
+        {!authPage && <nav className={`${styles.nav} ${menuOpen ? styles.open : ""}`}>
           <ul className={styles.list}>
             <li className={styles.navItem}>
               <Link href="/" onClick={closeMenu}>Головна</Link>
@@ -67,14 +85,29 @@ export default function Header() {
                   </Link>
                   {/* Кнопка пользователя с logout */}
                   <button className={styles.logoutBtn}>
-                    <AvatarIcon width={32} height={32} className={styles.avatarIcon} />
-                    <span>Імʼя</span>
-                    <LogoutIcon 
+                    <Image 
+                      src={user.avatarUrl || "/icons/avatar.svg"} 
+                      alt="Avatar"
+                      width={32} 
+                      height={32} 
+                      className={styles.avatarIcon} 
+                    />
+                    <span>{user.name}</span>
+                    <Icon 
+                      name="icon-logout"
                       width={18} 
                       height={19}
-                      onClick={(e: { stopPropagation: () => void; }) => {
-                        e.stopPropagation(); // блокирует клик по всей кнопке
-                        alert("Confirm logout"); //логика выхода
+                      className={cn(
+                        menuOpen
+                          ? styles.menuPrimary
+                          : type === "primary"
+                          ? styles.menuPrimary 
+                          : styles.menuSecondary 
+                        
+                      )} 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowConfirm(true); 
                       }}
                     />
                   </button>
@@ -91,7 +124,8 @@ export default function Header() {
               </li>
             )}
           </ul>
-        </nav>
+        </nav> }
+        
 
         {/* Кнопка "Опубликовать историю" для tablet */}
         {isAuth && (
@@ -104,24 +138,51 @@ export default function Header() {
           </Link>
         )}
         {/* Бургер-меню */}
-        <button
+        {!authPage && <button
           className={`${styles.burger} ${menuOpen ? styles.active : ""}`}
           onClick={toggleMenu}
           aria-label="Menu"
         >
           {menuOpen ? (
-            <CloseButtonImg 
-              className={cn(type === "primary" ? styles.menuPrimary : styles.menuSecondary)} 
+            <Icon 
+              name="icon-close"
+              width={24}
+              height={24}
+              className={cn(
+                type === "primary" 
+                ? styles.menuPrimary 
+                : menuOpen ? styles.menuPrimary
+                : styles.menuSecondary
+              )} 
             />
           ) : ( 
-            <BurgerMenuImg 
-              className={cn(type === "primary" ? styles.menuPrimary : styles.menuSecondary)} 
+            <Icon
+              name="icon-menu"
+              width={24}
+              height={24}
+              className={cn(
+                type === "primary" 
+                ? styles.menuPrimary 
+                : styles.menuSecondary
+              )} 
             />
           )}
-        </button>
+        </button>}
       </div>
 
       {menuOpen && <div onClick={closeMenu}></div>}
+
+       {/* Confirm logout */}
+       {showConfirm && (
+        <ConfirmModal
+          title="Ви точно хочете вийти?"
+          message="Ми будемо сумувати за вами!"
+          confirmButtonText="Вийти"
+          cancelButtonText="Відмінити"
+          onConfirm={() => setShowConfirm(false)}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
     </header>
   );
 }
