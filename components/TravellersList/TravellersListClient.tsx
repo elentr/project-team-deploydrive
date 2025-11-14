@@ -1,8 +1,9 @@
 "use client";
 
 import css from "./TravellersList.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 interface Traveller {
   _id: string;
@@ -12,29 +13,65 @@ interface Traveller {
   description: string;
 }
 
-export default function ShowMore({ travellers }: { travellers: Traveller[] }) {
-  const [displayCount, setDisplayCount] = useState(2);
-
+export default function ShowMTravellersListClientore({
+  initialTravellers,
+  totalItems,
+}: {
+  initialTravellers: Traveller[];
+  totalItems: number;
+}) {
+  const [travellers, setTravellers] = useState(initialTravellers);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [displayLimit, setDisplayLimit] = useState(12);
+  const [initialLimit, setInitialLimit] = useState(12);
   const router = useRouter();
-  const handleShowMore = () => {
-    setDisplayCount((prev) => prev + 1);
 
-    setTimeout(() => {
-      const items = document.querySelectorAll(`.${css.item}`);
-      const lastItem = items[items.length - 1];
-      lastItem?.scrollIntoView({ behavior: "smooth", block: "end" });
-    }, 50);
+  useEffect(() => {
+    const width = window.innerWidth;
+    const limit = width < 1440 ? 8 : 12;
+    setInitialLimit(limit);
+    setDisplayLimit(limit);
+  }, []);
+
+  const handleShowMore = async () => {
+    const nextPage = page + 1;
+    setLoading(true);
+
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users?page=${nextPage}&perPage=4`
+      );
+
+      if (res.data?.data?.data && Array.isArray(res.data.data.data)) {
+        setTravellers((prev) => [...prev, ...res.data.data.data]);
+        setPage(nextPage);
+
+        setDisplayLimit((prev) => prev + 4);
+
+        setTimeout(() => {
+          const items = document.querySelectorAll(`.${css.item}`);
+          const lastItem = items[items.length - 1];
+          lastItem?.scrollIntoView({ behavior: "smooth", block: "end" });
+        }, 50);
+      }
+    } catch (err) {
+      console.error("Could not load more travellers:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const displayedTravellers = travellers.slice(0, displayCount);
-  const hasMore = displayCount < travellers.length;
+  const displayedTravellers = travellers.slice(0, displayLimit);
+  const hasMore =
+    travellers.length < totalItems || displayedTravellers.length < totalItems;
 
   return (
     <>
       <ul className={css.list}>
-        {travellers.length > 0 ? (
-          displayedTravellers.map((t: Traveller) => (
-            <li key={t._id} className={css.item}>
+        {displayedTravellers.length > 0 ? (
+          displayedTravellers.map((t: Traveller, index: number) => (
+            <li key={`${t._id}-${index}`} className={css.item}>
               {t.avatarUrl ? (
                 <img
                   src={t.avatarUrl}
@@ -70,8 +107,13 @@ export default function ShowMore({ travellers }: { travellers: Traveller[] }) {
         )}
       </ul>
       {hasMore && (
-        <button type="button" className={css.btn} onClick={handleShowMore}>
-          Показати ще
+        <button
+          type="button"
+          className={css.btn}
+          onClick={handleShowMore}
+          disabled={loading}
+        >
+          {loading ? "Завантаження..." : "Показати ще"}
         </button>
       )}
     </>

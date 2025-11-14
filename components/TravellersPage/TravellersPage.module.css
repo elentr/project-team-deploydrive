@@ -1,0 +1,33 @@
+.container {
+  padding-top: 32px;
+  padding-bottom: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 110%;
+  letter-spacing: -0.01em;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+@media only screen and (min-width: 768px) {
+  .title {
+    font-size: 48px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .container {
+    padding-top: 48px;
+    padding-bottom: 72px;
+  }
+
+  .title {
+    font-size: 56px;
+  }
+}

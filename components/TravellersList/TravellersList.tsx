@@ -1,6 +1,6 @@
 import css from "./TravellersList.module.css";
 import axios from "axios";
-import ShowMore from "./TravellersListClient";
+import TravellersListClient from "./TravellersListClient";
 
 interface Traveller {
   _id: string;
@@ -17,20 +17,22 @@ export const nextServer = axios.create({
 
 export default async function TravellersList() {
   let travellers: Traveller[] = [];
+  let totalItems = 0;
 
   try {
-    const res = await nextServer.get("/users");
-    if (res.data && Array.isArray(res.data.data.data)) {
+    const res = await nextServer.get("/users?page=1&perPage=12");
+    if (res.data?.data?.data && Array.isArray(res.data.data.data)) {
       travellers = res.data.data.data;
+      totalItems = res.data.data.totalItems;
     }
   } catch (err) {
     console.error("Could not fetch travellers:", err);
   }
 
   return (
-    <section className={css.container}>
-      <h3 className={css.title}>Мандрівники</h3>
-      <ShowMore travellers={travellers} />
-    </section>
+    <TravellersListClient
+      initialTravellers={travellers}
+      totalItems={totalItems}
+    />
   );
 }
