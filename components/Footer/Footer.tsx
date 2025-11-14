@@ -24,7 +24,7 @@ export default function Footer() {
           {/* Logo - Left */}
           <Link href="/" className={css.logo}>
             <svg width="23" height="23">
-              <use href="/icons/icons.svg#icon-logo_plant" />
+              <use href="/icons.svg#icon-logo_plant" />
             </svg>
             <span>Подорожники</span>
           </Link>
@@ -39,8 +39,8 @@ export default function Footer() {
                 aria-label="Facebook"
                 className={css.socialLink}
               >
-                <svg width="23" height="23">
-                  <use href="/icons/icons.svg#icon-facebook" />
+                <svg width="32" height="32">
+                  <use href="/icons.svg#icon-facebook" />
                 </svg>
               </a>
             </li>
@@ -52,8 +52,8 @@ export default function Footer() {
                 aria-label="Instagram"
                 className={css.socialLink}
               >
-                <svg width="23" height="23">
-                  <use href="/icons/icons.svg#icon-instagram" />
+                <svg width="32" height="32">
+                  <use href="/icons.svg#icon-instagram" />
                 </svg>
               </a>
             </li>
@@ -65,8 +65,8 @@ export default function Footer() {
                 aria-label="X (Twitter)"
                 className={css.socialLink}
               >
-                <svg width="23" height="23">
-                  <use href="/icons/icons.svg#icon-x" />
+                <svg width="32" height="32">
+                  <use href="/icons.svg#icon-x" />
                 </svg>
               </a>
             </li>
@@ -78,8 +78,8 @@ export default function Footer() {
                 aria-label="YouTube"
                 className={css.socialLink}
               >
-                <svg width="23" height="23">
-                  <use href="/icons/icons.svg#icon-youtube" />
+                <svg width="32" height="32">
+                  <use href="/icons.svg#icon-youtube" />
                 </svg>
               </a>
             </li>
