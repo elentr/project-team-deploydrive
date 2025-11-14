@@ -98,7 +98,6 @@
 .copyright {
   text-align: center;
   padding-top: 24px;
-  padding-bottom: 32px;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
@@ -143,7 +142,6 @@
   .navList {
     flex-direction: row;
   }
-
 }
 
 /* Desktop - 1440px and up */
@@ -163,20 +161,20 @@
     justify-self: start;
   }
 
-  .social { 
-    justify-self: center; 
+  .social {
+    justify-self: center;
   }
 
   .nav {
-    grid-column: 3; 
-    grid-row: 1; 
-    justify-self: end; 
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
   }
 
   .link {
     font-size: 18px;
   }
-.copyright p {
-  font-size: 16px;
-}
+  .copyright p {
+    font-size: 16px;
+  }
 }
