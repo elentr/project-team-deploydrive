@@ -1,22 +1,19 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import cn from "classnames";
-import styles from "./Join.module.css";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import cn from 'classnames';
+import styles from './Join.module.css';
 
 export default function Join() {
-  // Тимчасовий стан авторизації (заміни реальним)
-  const [isAuth] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
 
   return (
-    <section className={cn(styles.section, "container")} id="join">
+    <section className={cn(styles.section, 'container')} id="join">
       <div className={styles.wrapper}>
-        {/* Фонова картинка з затемненням */}
         <div className={styles.imageWrapper}>
           <div className={styles.overlay}></div>
 
-          {/* Контент поверх */}
           <div className={styles.content}>
             <h2 className={styles.title}>Приєднуйтесь до нашої спільноти</h2>
             <p className={styles.text}>
@@ -39,4 +36,3 @@ export default function Join() {
     </section>
   );
 }
-
