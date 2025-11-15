@@ -1,4 +1,3 @@
-import css from "./TravellersList.module.css";
 import axios from "axios";
 import TravellersListClient from "./TravellersListClient";
 
