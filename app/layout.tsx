@@ -33,7 +33,6 @@ export default function RootLayout({
         <TanStackProvider>
           <Header />
           <main>{children}</main>
-          <TravellersPage />
           <Footer />
         </TanStackProvider>
       </body>
