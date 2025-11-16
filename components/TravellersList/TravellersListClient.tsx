@@ -4,6 +4,7 @@ import css from "./TravellersList.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Loader from "../Loader/Loader";
 
 interface Traveller {
   _id: string;
@@ -106,15 +107,19 @@ export default function ShowMTravellersListClientore({
           <li>Немає мандрівників</li>
         )}
       </ul>
-      {hasMore && (
-        <button
-          type="button"
-          className={css.btn}
-          onClick={handleShowMore}
-          disabled={loading}
-        >
-          {loading ? "Завантаження..." : "Показати ще"}
-        </button>
+      {loading ? (
+        <Loader />
+      ) : (
+        hasMore && (
+          <button
+            type="button"
+            className={css.btn}
+            onClick={handleShowMore}
+            disabled={loading}
+          >
+            Показати ще
+          </button>
+        )
       )}
     </>
   );
