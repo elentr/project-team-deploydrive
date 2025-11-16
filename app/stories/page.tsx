@@ -1,5 +1,5 @@
-import StoriesPage from "@/components/StoriesPage/StoriesPage";
+import TravellersStories from "@/components/TravellersStories/TravellersStories";
 
-export default function StoriesRoutePage() {
-  return <StoriesPage />;
+export default function StoriesPage() {
+  return <TravellersStories />;
 }

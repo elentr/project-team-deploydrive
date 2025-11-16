@@ -1,105 +1,86 @@
+/* Контейнер секції */
 .section {
-    padding-top: 64px;
-    padding-bottom: 64px;
-    background-color: #ffffff;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
-/* Заголовок секції */
+.inner {
+    width: 100%;
+    max-width: 1312px;
+    margin: 0 auto;
+}
+
+/* Заголовок */
 .title {
-    font-family: var(--font-sora-sans), sans-serif;
-    font-size: 28px;
     font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
-    color: #000000;
+    font-family: "Sora", sans-serif;
+    font-size: 62px;
+    line-height: 110%;
+    text-align: center;
     margin-bottom: 32px;
 }
 
-/* Грід карток */
+/* Фільтрація */
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.filterBtn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: #F7F8FC;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 16px;
+    white-space: nowrap;
+    color: #000;
+}
+
+/* АКТИВНА кнопка */
+.filterBtnActive {
+    background: #F2F2F2;
+    color: #000;
+    border: 1px solid transparent;
+}
+
+/* Сітка карток */
 .grid {
     display: grid;
-    grid-template-columns: 1fr;
     gap: 24px;
 }
 
-/* Обгортка для кнопки */
-.buttonWrap {
-    margin-top: 32px;
-    display: flex;
-    justify-content: center;
-}
-
-/* Кнопка "Переглянути всі" */
-.button {
-    padding: 12px 24px;
-    background-color: #e7ecf3;
-    border: 1px solid #c5ccd7;
-    border-radius: 16px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.button:hover,
-.button:focus {
-    background-color: #e8eeff;
-    color: #131f43;
-}
-
-.button:active {
-    background-color: #7a96ea;
-}
-
-/* Текст помилки / порожнього стану */
-.error,
-.empty {
-    margin-top: 16px;
-    font-size: 14px;
-    color: #495057;
-}
-
-/* Центрування лоадера */
-.loaderWrap,
-.loaderInline {
-    margin-top: 24px;
-    display: flex;
-    justify-content: center;
-}
-
-/* Tablet */
 @media (min-width: 768px) {
-    .section {
-        padding-top: 64px;
-        padding-bottom: 64px;
-    }
-
-    .title {
-        font-size: 32px;
-        margin-bottom: 40px;
-    }
-
     .grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* Desktop */
 @media (min-width: 1440px) {
-    .section {
-        padding-top: 72px;
-        padding-bottom: 72px;
-    }
-
-    .title {
-        font-size: 36px;
-    }
-
     .grid {
         grid-template-columns: repeat(3, 1fr);
     }
+}
 
-    .button {
-        font-size: 18px;
-    }
+/* Кнопка "Показати ще" */
+.buttonLoad {
+    margin: 32px auto 0;
+    padding: 6px 12px;
+    height: 48px;
+    min-width: 163px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #4169E1;
+    color: white;
+    border-radius: 8px;
+    border: 1px solid #4169E1;
+    font-size: 16px;
+    cursor: pointer;
 }

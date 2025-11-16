@@ -1,170 +1,133 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import cn from "classnames";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import TravellersStoriesItem from "../TravellersStoriesItem/TravellersStoriesItem";
 import styles from "./TravellersStories.module.css";
-import TravellersStoriesItem, {
-  Story,
-} from "../TravellersStoriesItem/TravellersStoriesItem";
-import Loader from "../Loader/Loader";
 
-/**
- * Визначаємо розмір порції карток за шириною екрана:
- * - mobile (<768px)   → 9
- * - tablet (768–1439) → 8
- * - desktop (≥1440px) → 9
- */
-function getPageSizeByWidth(width: number): number {
-  if (width >= 1440) return 9;
-  if (width >= 768) return 8;
-  return 9;
+import type { Story } from "../TravellersStoriesItem/TravellersStoriesItem";
+
+interface ApiStory {
+  _id: string;
+  img: string;
+  title: string;
+  article: string;
+  categoryName: string;
+  date: string;
+  ownerId: string;
+  favoriteCount: number;
+}
+
+const SHOW_PER_PAGE = 9;
+const SERVER_PER_PAGE = 10;
+
+// mapper
+function mapStory(api: ApiStory): Story {
+  return {
+    _id: api._id,
+    img: api.img,
+    title: api.title,
+    category: api.categoryName,
+    description: api.article.slice(0, 180) + "...",
+    author: "Автор",
+    avatar: "/images/avatar.png",
+    date: api.date,
+    readTime: 1,
+  };
 }
 
 export default function TravellersStories() {
-  const [stories, setStories] = useState<Story[]>([]);
+  const [allStories, setAllStories] = useState<Story[]>([]);
+  const [visibleStories, setVisibleStories] = useState<Story[]>([]);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<number | null>(null);
+  const [activeCategory, setActiveCategory] = useState("all");
   const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Визначаємо pageSize тільки на клієнті
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const width = window.innerWidth;
-    const size = getPageSizeByWidth(width);
-    setPageSize(size);
+  // ----------- FETCH PAGE -------------
+  const fetchPage = useCallback(async (pageNumber: number) => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/stories`,
+      { params: { page: pageNumber, limit: SERVER_PER_PAGE } }
+    );
+
+    const items = res.data.data.data.map(mapStory);
+
+    // додаємо у глобальний список
+    setAllStories(prev => [...prev, ...items]);
+    setHasMore(res.data.data.hasNextPage);
   }, []);
 
-  // Початкове завантаження першої сторінки
+  // ----------- INITIAL LOAD -----------
   useEffect(() => {
-    if (pageSize === null) return;
-    void fetchStories(1, pageSize, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize]);
+    (async () => {
+      await fetchPage(1);
+    })();
+  }, [fetchPage]);
 
-  /**
-   * Функція запиту до бекенду
-   */
-  const fetchStories = async (
-    targetPage: number,
-    limit: number,
-    replace: boolean
-  ) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  // ----------- UPDATE VISIBLE LIST -----------
+  useEffect(() => {
+    (async () => {
+      const filtered =
+        activeCategory === "all"
+          ? allStories
+          : allStories.filter(s => s.category === activeCategory);
 
-      const baseUrl =
-        process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+      const slice = filtered.slice(0, page * SHOW_PER_PAGE);
 
-      const res = await fetch(
-        `${baseUrl}/api/stories?page=${targetPage}&limit=${limit}`,
-        {
-          credentials: "include",
-        }
-      );
+      await Promise.resolve();
+      setVisibleStories(slice);
+    })();
+  }, [allStories, page, activeCategory]);
 
-      if (!res.ok) {
-        throw new Error("Не вдалося завантажити історії");
-      }
+  // ----------- FILTER BUTTON -----------
+  const handleFilter = (cat: string) => {
+    setActiveCategory(cat);
+    setPage(1);
+    setVisibleStories([]); // очищаємо перед новим застосуванням
+  };
 
-      const data = await res.json();
+  // ----------- LOAD MORE -----------
+  const loadMore = async () => {
+    const next = page + 1;
+    setPage(next);
 
-      // Підлаштовуємося під можливі формати відповіді:
-      // { stories: [...] } або { data: [...] }
-      const incoming: Story[] = Array.isArray(data.stories)
-        ? data.stories
-        : Array.isArray(data.data)
-        ? data.data
-        : [];
-
-      if (!Array.isArray(incoming)) {
-        throw new Error("Невірний формат даних від сервера");
-      }
-
-      setStories(prev =>
-        replace ? incoming : [...prev, ...incoming]
-      );
-
-      // Якщо прийшло менше, ніж limit — далі немає що вантажити
-      if (incoming.length < limit) {
-        setHasMore(false);
-      } else {
-        setHasMore(true);
-      }
-
-      setPage(targetPage);
-    } catch (err: unknown) {
-      console.error("Помилка завантаження історій:", err);
-      setError("Сталася помилка під час завантаження історій.");
-      setHasMore(false);
-    } finally {
-      setIsLoading(false);
-      setInitialLoading(false);
+    // якщо нам НЕ вистачає карток — догружаємо наступну сторінку
+    if (allStories.length < next * SHOW_PER_PAGE) {
+      await fetchPage(next);
     }
   };
 
-  /**
-   * Обробник кнопки "Переглянути всі"
-   */
-  const handleLoadMore = () => {
-    if (!pageSize || isLoading || !hasMore) return;
-    const nextPage = page + 1;
-    void fetchStories(nextPage, pageSize, false);
-  };
-
   return (
-    <section className={cn(styles.section, "container")}>
-      <h2 className={styles.title}>Історії мандрівників</h2>
+    <section className={styles.section}>
+      <div className={styles.inner}>
+        <h2 className={styles.title}>Історії мандрівників</h2>
 
-      {/* Початковий лоадер */}
-      {initialLoading && isLoading && (
-        <div className={styles.loaderWrap}>
-          <Loader />
+        <div className={styles.filters}>
+          {["all", "Європа", "Азія", "Пустелі", "Африка", "Америка", "Гори"].map(id => (
+            <button
+              key={id}
+              className={`${styles.filterBtn} ${
+                activeCategory === id ? styles.filterBtnActive : ""
+              }`}
+              onClick={() => handleFilter(id)}
+            >
+              {id === "all" ? "Всі історії" : id}
+            </button>
+          ))}
         </div>
-      )}
 
-      {/* Повідомлення про помилку */}
-      {error && !isLoading && (
-        <p className={styles.error}>{error}</p>
-      )}
+        <div className={styles.grid}>
+          {visibleStories.map(s => (
+            <TravellersStoriesItem key={s._id} story={s} />
+          ))}
+        </div>
 
-      {/* Порожній стан, якщо історій немає */}
-      {!initialLoading &&
-        !isLoading &&
-        !error &&
-        stories.length === 0 && (
-          <p className={styles.empty}>Історій поки що немає.</p>
-        )}
-
-      {/* Список карток */}
-      <div className={styles.grid}>
-        {stories.map(story => (
-          <TravellersStoriesItem key={story._id} story={story} />
-        ))}
-      </div>
-
-      {/* Кнопка "Переглянути всі" — тільки якщо ще є що вантажити */}
-      {hasMore && !isLoading && stories.length > 0 && (
-        <div className={styles.buttonWrap}>
-          <button
-            type="button"
-            className={styles.button}
-            onClick={handleLoadMore}
-          >
-            Переглянути всі
+        {hasMore && (
+          <button className={styles.buttonLoad} onClick={loadMore}>
+            Показати ще
           </button>
-        </div>
-      )}
-
-      {/* Лоадер під час догрузки наступних порцій */}
-      {isLoading && !initialLoading && (
-        <div className={styles.loaderInline}>
-          <Loader />
-        </div>
-      )}
+        )}
+      </div>
     </section>
   );
 }
