@@ -1,4 +1,6 @@
 import styles from "./page.module.css";
+import Link from "next/link";
+
 
 import Hero from "@/components/Hero/Hero";
 // import Popular from "@/components/Popular/Popular";
@@ -17,3 +19,10 @@ export default function Home() {
     </>
   );
 }
+
+<Link
+  href="/stories"
+  className="text-blue-600 underline hover:text-blue-800"
+>
+  Переглянути всі історії
+</Link>

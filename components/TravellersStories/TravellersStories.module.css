@@ -1,0 +1,21 @@
+.stories__list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    justify-content: center;
+    list-style: none;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.loadMoreBtn {
+    margin: 32px auto 0;
+    display: block;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    background-color: var(--color-scheme-1-accent);
+    color: white;
+}
