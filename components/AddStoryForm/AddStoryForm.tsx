@@ -9,6 +9,7 @@ import { useStoryDraft, initialDraft } from "@/lib/store/storyStore";
 import { Modal } from "@/components/CreateStoryErrorModal/Modal";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Loader from "../Loader/Loader";
 
 interface InitialData {
   id: string;
@@ -361,13 +362,17 @@ export default function StoryForm({
 
       {/* Дії */}
       <div className={css.actionsWrap}>
-        <button
-          type="submit"
-          className={css.submitBtn}
-          disabled={isSaveDisabled}
-        >
-          {mutation.isPending ? "Збереження..." : "Зберегти"}
-        </button>
+        {mutation.isPending ? (
+          <Loader />
+        ) : (
+          <button
+            type="submit"
+            className={css.submitBtn}
+            disabled={isSaveDisabled}
+          >
+            Зберегти
+          </button>
+        )}
 
         <button type="button" className={css.cancelBtn} onClick={onCancel}>
           Відмінити
