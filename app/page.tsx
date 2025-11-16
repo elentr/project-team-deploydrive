@@ -1,18 +1,18 @@
-import styles from "./page.module.css";
+import styles from './page.module.css';
 
-import Hero from "@/components/Hero/Hero";
-// import Popular from "@/components/Popular/Popular";
-// import TravellersList from "@/components/TravellersList/TravellersList";
-import About from "@/components/About/About";
-import Join from "@/components/Join/Join";
+import Hero from '@/components/Hero/Hero';
+import Popular from '@/components/Popular/Popular';
+import OurTravellers from '@/components/OurTravellers/OurTravellers';
+import About from '@/components/About/About';
+import Join from '@/components/Join/Join';
 
 export default function Home() {
   return (
     <>
-      <Hero/>
+      <Hero />
       <About />
-      {/* <Popular /> */}
-      {/* <TravellersList /> */}
+      <Popular />
+      <OurTravellers />
       <Join />
     </>
   );
