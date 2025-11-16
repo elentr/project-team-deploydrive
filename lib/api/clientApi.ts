@@ -1,5 +1,6 @@
 import { apiClient } from './api';
 import type { User } from '@/types/user';
+import type { Story } from '@/types/story';
 import axios from "axios";
 
 export const authService = {
@@ -34,3 +35,15 @@ clientApi.interceptors.request.use((config) => {
   }
   return config;
 });
+
+
+export async function getStories(): Promise<Story[]> {
+  try {
+    const res = await clientApi.get('/api/stories')
+
+    return res.data.data.data;
+  } catch (err) {
+    console.error('Error:', err);
+    return [];
+  }
+}
