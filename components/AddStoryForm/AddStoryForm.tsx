@@ -9,45 +9,83 @@ import { useStoryDraft, initialDraft } from "@/lib/store/storyStore";
 import { Modal } from "@/components/CreateStoryErrorModal/Modal";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Loader from "../Loader/Loader";
 
-interface StoryFormProps {
-  onSuccess: (id: string) => void;
-  onCancel: () => void;
+interface InitialData {
+  id: string;
+  title: string;
+  categoryId: string;
+  shortDescription: string;
+  body: string;
+  imageUrl: string;
 }
 
-const validationSchema = Yup.object({
-  storyImage: Yup.mixed()
-    .required("Додайте фото до історії")
-    .test("fileType", "Файл має бути у форматі JPEG, PNG або WEBP", (value) => {
-      if (!value) return false;
-      const file = value as File;
-      return ["image/jpeg", "image/png", "image/webp"].includes(file.type);
-    })
-    .test("fileSize", "Файл завеликий — максимум 2MB", (value) => {
-      if (!value) return false;
-      const file = value as File;
-      return file.size <= 2 * 1024 * 1024; 
-    }),
+interface StoryFormProps {
+  onSuccess: (id?: string) => void;
+  onCancel: () => void;
+  initialData?: InitialData;
+}
 
-  title: Yup.string()
-    .trim()
-    .max(80, "Максимум 80 символів")
-    .required("Вкажіть заголовок"),
-
-  description: Yup.string()
-    .trim()
-    .max(2500, "Опис занадто великий — максимум 2500 символів")
-    .required("Додайте опис історії"),
-
-  category: Yup.string()
-    .required("Оберіть категорію"),
-});
-
-export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
+export default function StoryForm({
+  onSuccess,
+  onCancel,
+  initialData,
+}: StoryFormProps) {
   const qc = useQueryClient();
   const { draft, setDraft, clearDraft } = useStoryDraft();
   const [errorOpen, setErrorOpen] = useState(false);
+  const isEditMode = !!initialData;
 
+  const validationSchema = Yup.object({
+    storyImage: isEditMode
+      ? Yup.mixed()
+          .test(
+            "fileType",
+            "Файл має бути у форматі JPEG, PNG або WEBP",
+            (value) => {
+              if (!value) return true;
+              const file = value as File;
+              return ["image/jpeg", "image/png", "image/webp"].includes(
+                file.type
+              );
+            }
+          )
+          .test("fileSize", "Файл завеликий — максимум 2MB", (value) => {
+            if (!value) return true;
+            const file = value as File;
+            return file.size <= 2 * 1024 * 1024;
+          })
+      : Yup.mixed()
+          .required("Додайте фото до історії")
+          .test(
+            "fileType",
+            "Файл має бути у форматі JPEG, PNG або WEBP",
+            (value) => {
+              if (!value) return false;
+              const file = value as File;
+              return ["image/jpeg", "image/png", "image/webp"].includes(
+                file.type
+              );
+            }
+          )
+          .test("fileSize", "Файл завеликий — максимум 2MB", (value) => {
+            if (!value) return false;
+            const file = value as File;
+            return file.size <= 2 * 1024 * 1024;
+          }),
+
+    title: Yup.string()
+      .trim()
+      .max(80, "Максимум 80 символів")
+      .required("Вкажіть заголовок"),
+
+    body: Yup.string()
+      .trim()
+      .max(2500, "Опис занадто великий — максимум 2500 символів")
+      .required("Додайте опис історії"),
+
+    categoryId: Yup.string().required("Оберіть категорію"),
+  });
   const bodyRef = useRef<HTMLTextAreaElement | null>(null);
 
   const autoResize = () => {
@@ -61,12 +99,13 @@ export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
     autoResize();
   }, []);
 
-  const { data: categories, isLoading: isCategoriesLoading } =
-    useQuery<Category[]>({
-      queryKey: ["categories"],
-      queryFn: fetchCategories,
-      staleTime: 5 * 60 * 1000,
-    });
+  const { data: categories, isLoading: isCategoriesLoading } = useQuery<
+    Category[]
+  >({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const mutation = useMutation({
     mutationFn: (fd: FormData) => createStory(fd),
@@ -82,11 +121,13 @@ export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
 
   const formik = useFormik({
     initialValues: {
-      storyImage: draft.storyImage ?? null,
-      title: draft.title ?? initialDraft.title,
-      categoryId: draft.categoryId ?? initialDraft.categoryId,
-      shortDescription: draft.shortDescription ?? "",
-      body: draft.body ?? initialDraft.body,
+      storyImage: initialData ? null : (draft.storyImage ?? null),
+      title: initialData?.title ?? draft.title ?? initialDraft.title,
+      categoryId:
+        initialData?.categoryId ?? draft.categoryId ?? initialDraft.categoryId,
+      shortDescription:
+        initialData?.shortDescription ?? draft.shortDescription ?? "",
+      body: initialData?.body ?? draft.body ?? initialDraft.body,
     },
     enableReinitialize: false,
     validationSchema,
@@ -100,47 +141,52 @@ export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
       fd.append("category", values.categoryId);
       fd.append("article", values.body.trim());
 
+      if (isEditMode && initialData?.id) {
+        fd.append("id", initialData.id);
+      }
+
       mutation.mutate(fd);
     },
   });
 
+  const previewUrl = useMemo(() => {
+    if (formik.values.storyImage) {
+      return URL.createObjectURL(formik.values.storyImage);
+    }
 
-const previewUrl = useMemo(() => {
-  if (!formik.values.storyImage) return null;
-  return URL.createObjectURL(formik.values.storyImage);
-}, [formik.values.storyImage]);
+    if (isEditMode && initialData?.imageUrl) {
+      return initialData.imageUrl;
+    }
+    return null;
+  }, [formik.values.storyImage, isEditMode, initialData]);
 
+  useEffect(() => {
+    if (!previewUrl || formik.values.storyImage) return;
+    return () => {
+      if (typeof previewUrl === "string" && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl, formik.values.storyImage]);
 
-useEffect(() => {
-  if (!previewUrl) return;
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHydrated(true);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const url = previewUrl;
-
-  return () => {
-    URL.revokeObjectURL(url);
-  };
-}, [previewUrl]);
-
-
-const [hydrated, setHydrated] = useState(false);
-useEffect(() => {
-  setHydrated(true);
-}, []);
-
-  const isSaveDisabled =
-    !formik.isValid ||
-    !formik.dirty ||
-    mutation.isPending;
+  const isSaveDisabled = !formik.isValid || !formik.dirty || mutation.isPending;
 
   function updateDraft(update: Partial<typeof draft>) {
-  setTimeout(() => {
-    setDraft(update);
-  }, 0);
+    setTimeout(() => {
+      setDraft(update);
+    }, 0);
   }
   const shortDescLength = formik.values.shortDescription?.length ?? 0;
   return (
     <form className={css.form} onSubmit={formik.handleSubmit}>
-
       {/* Обкладинка */}
       <div className={css.formGroup}>
         <label className={css.label}>Обкладинка статті</label>
@@ -176,14 +222,18 @@ useEffect(() => {
             onChange={(e) => {
               const file = e.target.files?.[0] ?? null;
               formik.setFieldValue("storyImage", file);
-              updateDraft({ storyImage: file });
+              if (!isEditMode) {
+                updateDraft({ storyImage: file });
+              }
             }}
             onBlur={formik.handleBlur}
           />
         </div>
 
         {formik.touched.storyImage && formik.errors.storyImage && (
-          <span className={css.error}>{formik.errors.storyImage as string}</span>
+          <span className={css.error}>
+            {formik.errors.storyImage as string}
+          </span>
         )}
       </div>
 
@@ -200,7 +250,9 @@ useEffect(() => {
           value={formik.values.title}
           onChange={(e) => {
             formik.handleChange(e);
-            updateDraft({ title: e.target.value });
+            if (!isEditMode) {
+              updateDraft({ title: e.target.value });
+            }
           }}
           onBlur={formik.handleBlur}
           required
@@ -224,18 +276,21 @@ useEffect(() => {
           value={formik.values.categoryId}
           onChange={(e) => {
             formik.handleChange(e);
-            updateDraft({ categoryId: e.target.value });
+            if (!isEditMode) {
+              updateDraft({ categoryId: e.target.value });
+            }
           }}
           onBlur={formik.handleBlur}
         >
           <option value="" disabled>
             {isCategoriesLoading ? "Завантаження..." : "Категорія"}
           </option>
-          {(categories ?? []).map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
+          {Array.isArray(categories) &&
+            categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
         </select>
 
         {formik.touched.categoryId && formik.errors.categoryId && (
@@ -256,7 +311,9 @@ useEffect(() => {
           value={formik.values.shortDescription}
           onChange={(e) => {
             formik.handleChange(e);
-            updateDraft({ shortDescription: e.target.value });
+            if (!isEditMode) {
+              updateDraft({ shortDescription: e.target.value });
+            }
           }}
           onBlur={formik.handleBlur}
           maxLength={61}
@@ -264,11 +321,8 @@ useEffect(() => {
         />
 
         <div className={css.hintRow}>
-          {formik.touched.shortDescription &&
-          formik.errors.shortDescription ? (
-            <span className={css.error}>
-              {formik.errors.shortDescription}
-            </span>
+          {formik.touched.shortDescription && formik.errors.shortDescription ? (
+            <span className={css.error}>{formik.errors.shortDescription}</span>
           ) : (
             <span className={css.hint}>Лишилося символів: </span>
           )}
@@ -294,11 +348,12 @@ useEffect(() => {
           rows={1}
           onChange={(e) => {
             formik.handleChange(e);
-            updateDraft({ body: e.target.value });
+            if (!isEditMode) {
+              updateDraft({ body: e.target.value });
+            }
             autoResize();
           }}
           onBlur={formik.handleBlur}
-          
         />
         {formik.touched.body && formik.errors.body && (
           <span className={css.error}>{formik.errors.body}</span>
@@ -307,9 +362,17 @@ useEffect(() => {
 
       {/* Дії */}
       <div className={css.actionsWrap}>
-        <button type="submit" className={css.submitBtn} disabled={isSaveDisabled}>
-          {mutation.isPending ? "Збереження..." : "Зберегти"}
-        </button>
+        {mutation.isPending ? (
+          <Loader />
+        ) : (
+          <button
+            type="submit"
+            className={css.submitBtn}
+            disabled={isSaveDisabled}
+          >
+            Зберегти
+          </button>
+        )}
 
         <button type="button" className={css.cancelBtn} onClick={onCancel}>
           Відмінити
