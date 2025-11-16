@@ -1,0 +1,133 @@
+.form {
+  display: grid;
+  gap: 24px;
+  color: #000000;
+  padding-bottom: 64px;
+}
+.label {
+  font-size: 16px;
+  color: #000000;
+}
+.formGroup {
+  display: grid;
+  gap: 8px;
+}
+
+.coverPreview,
+.coverImg {
+  width: 280px;
+  height: 160px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.uploadBtn {
+  display: inline-block;
+  padding: 10px 4px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  color: #000;
+  margin-top: 24px;
+}
+
+.fileHidden {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.input,
+.select,
+.textarea {
+  color: #000000;
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+.textarea {
+  min-height: 180px;
+  overflow: hidden;
+  resize: none;
+}
+.hint {
+  color: #6b7280;
+  font-size: 12px;
+}
+.counter {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.actionsWrap {
+  display: grid;
+  gap: 16px;
+}
+
+.submitBtn {
+  background: #60a5fa;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #000000;
+  font-size: 16px;
+}
+
+@media only screen and (min-width: 768px) {
+  .coverPreview,
+  .coverImg {
+    width: 704px;
+    height: 469px;
+  }
+}
+@media only screen and (min-width: 1440px) {
+  .form {
+    display: grid;
+    grid-template-columns: minmax(0, 2.4fr) minmax(220px, 1fr);
+    column-gap: 26px;
+    row-gap: 20px;
+    align-items: flex-start;
+  }
+
+  .coverPreview,
+  .coverImg {
+    width: 865px;
+    height: 576px;
+  }
+
+  .formGroup {
+    grid-column: 1 / 2;
+    display: flex;
+    flex-direction: column;
+  }
+  .actionsWrap {
+    grid-column: 2 / 3;
+    grid-row: 1/2;
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+  }
+}

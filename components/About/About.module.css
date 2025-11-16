@@ -1,0 +1,120 @@
+.section {
+    padding-top: 64px;
+    padding-bottom: 64px;
+    background-color: #ffffff;
+    color: #000;
+  }
+  
+
+
+  .textBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 64px;
+  }
+  
+  .title {
+    font-family: var(--font-sora-sans), sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  
+  .text {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .cardTitle {
+    font-family: var(--font-sora-sans), sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  
+  .cardText {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  @media (min-width: 768px) {
+    .textBlock{
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 24px;
+    }
+
+    .title {
+        flex: 1;
+        font-size: 44px;
+        max-width: 50%;
+    }
+
+    .text {
+        flex: 1;
+        max-width: 50%;
+    }
+  
+    .cards {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: flex-start;
+        text-align: left;
+    }
+  
+    .card {
+      flex: 1;
+    }
+  }
+  @media (min-width: 1440px) {
+    .section {
+        padding-top: 72px;
+        padding-bottom: 72px;
+    }
+    
+    .title {
+        font-size: 52px;
+        max-width: 60%;
+    }
+
+    .text {
+        font-size: 20px;
+        max-width: 40%;
+    }
+
+    .cards{
+        justify-content: center;
+        gap: 48px;
+    }
+
+    .card {
+        flex: 0 1 405px;
+    }
+
+    .cardTitle {
+        font-size: 32px;
+    }
+
+    .cardText {
+        font-size: 18px;
+        max-width: 405px;
+    }
+  }

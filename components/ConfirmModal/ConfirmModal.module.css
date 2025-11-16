@@ -1,0 +1,809 @@
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 64px;
+  padding-bottom: 64px;
+  z-index: 1000;
+}
+
+.modalExit {
+  width: 768px;
+  height: 312px;
+  max-width: 768px;
+  background: var(--Color-Scheme-2-Background, #f7f9ff);
+  border-radius: 24px;
+  padding: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  opacity: 1;
+  position: relative;
+}
+
+.modalError {
+  width: 768px;
+  height: 400px;
+  max-width: 768px;
+  background: var(--Color-Scheme-2-Background, #f7f9ff);
+  border-radius: 24px;
+  padding: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  opacity: 1;
+  position: relative;
+}
+
+.sectionTitleExit {
+  width: 640px;
+  height: 104px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.headingExit {
+  width: 640px;
+  height: 58px;
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 120%;
+  letter-spacing: -1%;
+  text-align: center;
+  color: var(--Color-Scheme-1-Text, rgba(0, 0, 0, 1));
+  margin: 0;
+}
+
+.textExit {
+  width: 640px;
+  height: 30px;
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 150%;
+  letter-spacing: 0%;
+  text-align: center;
+  color: var(--Color-Scheme-1-Text, rgba(0, 0, 0, 1));
+  margin: 0;
+}
+
+.sectionTitleError {
+  width: 640px;
+  height: 192px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.headingError {
+  width: 640px;
+  height: 116px;
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 120%;
+  letter-spacing: -1%;
+  text-align: center;
+  color: var(--Color-Scheme-1-Text, rgba(0, 0, 0, 1));
+  margin: 0;
+}
+
+.textError {
+  width: 640px;
+  height: 60px;
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 150%;
+  letter-spacing: 0%;
+  text-align: center;
+  color: var(--Color-Scheme-1-Text, rgba(0, 0, 0, 1));
+  margin: 0;
+}
+
+.formExit {
+  width: 430px;
+  height: 48px;
+  gap: 24px;
+}
+
+.form {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.cancelBtnError {
+  width: 203px;
+  height: 48px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--Color-Scheme-2-Border, rgba(0, 0, 0, 0.15));
+  background: var(--Opacity-Neutral-Darkest-5, rgba(0, 0, 0, 0.05));
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  cursor: pointer;
+  color: #000;
+  transition: background 0.2s ease;
+}
+
+.cancelBtnExit {
+  width: 203px;
+  height: 48px;
+  padding: 6px 12px;
+  border-radius: 8px; /* Radius/Small */
+  border: 1px solid var(--Color-Scheme-2-Border, rgba(0, 0, 0, 0.15));
+  background: var(--Opacity-Neutral-Darkest-5, rgba(0, 0, 0, 0.05));
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  cursor: pointer;
+  color: #000;
+  transition: background 0.2s ease;
+}
+
+.confirmBtnExit {
+  width: 203px;
+  height: 48px;
+  padding: 6px 12px;
+  border-radius: 8px; /* Radius/Small */
+  border: 1px solid var(--Color-Royal-Blue, rgba(65, 105, 225, 1));
+  background: var(--Color-Royal-Blue, rgba(65, 105, 225, 1));
+  color: var(--Color-White, #fff);
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.formError {
+  width: 430px;
+  height: 48px;
+  gap: 24px;
+}
+
+.confirmBtnError {
+  width: 203px;
+  height: 48px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--Color-Royal-Blue, rgba(65, 105, 225, 1));
+  background: var(--Color-Royal-Blue, rgba(65, 105, 225, 1));
+  color: var(--Color-White, #fff);
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cancelBtn:hover {
+  background: rgba(65, 105, 225, 0.1);
+}
+
+.confirmBtn {
+  background: #4169e1;
+  border: 1px solid #4169e1;
+  color: #fff;
+}
+
+.confirmBtn:hover {
+  background: #3158c5;
+}
+
+.closeButton {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.2s ease;
+}
+
+.closeButton img,
+.closeButton svg {
+  width: 14px;
+  height: 14px;
+}
+
+.closeButton:hover {
+  background: #f0f0f0;
+}
+
+.closeButton::before,
+.closeButton::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px; /* довжина ліній */
+  height: 2.5px; /* товщина ліній */
+  background-color: #000000;
+  border-radius: 2px;
+  transform-origin: center;
+  transition: background 0.2s ease;
+}
+
+.closeButton::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.closeButton::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.closeButton:hover::before,
+.closeButton:hover::after {
+  background-color: #333333;
+}
+
+.confirmBtnExit:active,
+.confirmBtnError:active {
+  background: #254bba; /* темніший відтінок */
+  border-color: #254bba;
+  color: #000;
+}
+
+.confirmBtnExit:disabled,
+.confirmBtnError:disabled {
+  background: #c8d1fa;
+  border-color: #c8d1fa;
+  color: #ffffffb3;
+  cursor: not-allowed;
+}
+
+.cancelBtnExit:active,
+.cancelBtnError:active {
+  background: #254bba;
+  border-color: #254bba;
+  color: #fff;
+}
+
+.cancelBtnExit:hover,
+.cancelBtnError:hover,
+.cancelBtnExit:focus-visible,
+.cancelBtnError:focus-visible {
+  background: #4169e1;
+  border-color: #4169e1;
+  color: #fff;
+}
+
+.confirmBtnExit:hover,
+.confirmBtnError:hover,
+.confirmBtnExit:focus-visible,
+.confirmBtnError:focus-visible {
+  background: #e8f0ff; /* світло-блакитний фон */
+  border: 1px solid #4169e1; /* синя обводка */
+  color: #000;
+}
+
+.cancelBtnExit:disabled,
+.cancelBtnError:disabled {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.3);
+  cursor: not-allowed;
+}
+
+/* 💻 Планшет */
+@media (min-width: 376px) and (max-width: 768px) {
+  .backdrop {
+    width: 100vw;
+    height: 100vh;
+    padding-top: 64px;
+    padding-bottom: 64px;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+  }
+
+  .form {
+    width: 430px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    opacity: 1;
+  }
+
+  .modalExit,
+  .modalError {
+    padding: 64px 32px;
+  }
+
+  .contactModalExit,
+  .contactModalError {
+    width: 768px;
+    height: 899px; /* для виходу */
+    max-width: 100%;
+    padding: 64px var(--Page-Padding) 64px var(--Page-Padding);
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modalExit {
+    width: 704px;
+    height: 286px;
+    max-width: 768px;
+    background: var(--Color-Scheme-2-Background, #f7f9ff);
+    border-radius: var(--Radius-Large);
+    border-radius: 24px;
+    padding: 64px var(--padding-global) var(--padding-global)
+      var(--padding-global);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    position: relative;
+  }
+
+  .modalError {
+    width: 704px;
+    height: 310px;
+    max-width: 768px;
+    background: var(--Color-Scheme-2-Background, #f7f9ff);
+    border-radius: var(--Radius-Large);
+    padding: 64px var(--padding-global) var(--padding-global)
+      var(--padding-global);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    position: relative;
+    border-radius: 24px;
+  }
+
+  .sectionTitleExit,
+  .sectionTitleError {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .sectionTitleExit {
+    width: 640px;
+    height: 78px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .headingExit {
+    width: 640px;
+    height: 38px;
+    font-family: "Sora", sans-serif;
+    font-weight: 700;
+    font-size: 32px; /* Heading 3 */
+    line-height: 120%;
+    letter-spacing: -1%;
+    text-align: center;
+    color: var(--Color-Scheme-1-Text, rgba(0, 0, 0, 1));
+    margin: 0;
+  }
+
+  .textExit {
+    width: 640px;
+    height: 24px;
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 400;
+    font-size: 18px; /* Text Medium */
+    line-height: 150%;
+    letter-spacing: 0%;
+    text-align: center;
+    color: var(--Color-Scheme-1-Text, rgba(0, 0, 0, 1));
+    margin: 0;
+  }
+
+  .sectionTitleError {
+    width: 640px;
+    height: 102px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .headingError {
+    width: 640px;
+    height: 38px;
+    font-family: "Sora", sans-serif;
+    font-weight: 700;
+    font-size: 32px; /* Heading 3 */
+    line-height: 120%;
+    letter-spacing: -1%;
+    text-align: center;
+    color: var(--Color-Scheme-1-Text, rgba(0, 0, 0, 1));
+    margin: 0;
+  }
+
+  .textError {
+    width: 640px;
+    height: 48px;
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 400;
+    font-size: 18px; /* Text Medium */
+    line-height: 150%;
+    letter-spacing: 0%;
+    text-align: center;
+    color: var(--Color-Scheme-1-Text, rgba(0, 0, 0, 1));
+    margin: 0;
+  }
+
+  .formExit {
+    width: 430px;
+    height: 48px;
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+  }
+
+  .cancelBtnExit {
+    width: 203px;
+    height: 48px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--Color-Scheme-2-Border, rgba(0, 0, 0, 0.15));
+    background: var(--Opacity-Neutral-Darkest-5, rgba(0, 0, 0, 0.05));
+    color: var(--Color-Neutral-Darkest, rgba(0, 0, 0, 1));
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 150%;
+    cursor: pointer;
+  }
+
+  .confirmBtnExit {
+    width: 203px;
+    height: 48px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--Color-Royal-Blue, rgba(65, 105, 225, 1));
+    background: var(--Color-Royal-Blue, rgba(65, 105, 225, 1));
+    color: var(--Color-White, #fff);
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 150%;
+    cursor: pointer;
+  }
+
+  .formError {
+    width: 430px;
+    height: 48px;
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+  }
+
+  .cancelBtnError {
+    width: 203px;
+    height: 48px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--Color-Scheme-2-Border, rgba(0, 0, 0, 0.15));
+    background: var(--Opacity-Neutral-Darkest-5, rgba(0, 0, 0, 0.05));
+    color: var(
+      --Color-Neutral-Darkest,
+      rgba(0, 0, 0, 1)
+    ); /* чорний текст для кнопки "Увійти" */
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 150%;
+    cursor: pointer;
+  }
+
+  .confirmBtnError {
+    width: 203px;
+    height: 48px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--Color-Royal-Blue, rgba(65, 105, 225, 1));
+    background: var(--Color-Royal-Blue, rgba(65, 105, 225, 1));
+    color: var(
+      --Color-White,
+      #fff
+    ); /* білий текст для кнопки "Зареєструватись" */
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 150%;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 375px) {
+  .backdrop {
+    width: 100vw;
+    height: 100vh;
+    padding-top: 64px;
+    padding-bottom: 64px;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .form {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .modalExit {
+    width: 335px;
+    height: 338px;
+    max-width: 768px;
+    background: var(--Color-Scheme-2-Background, #f7f9ff);
+    border-radius: var(--Radius-Large);
+    gap: 32px;
+    padding: 64px var(--padding-global) var(--padding-global)
+      var(--padding-global);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .modalError {
+    width: 335px;
+    height: 386px;
+    max-width: 768px;
+    background: var(--Color-Scheme-2-Background, #f7f9ff);
+    border-radius: var(--Radius-Large);
+    gap: 32px;
+    padding: 64px var(--padding-global) var(--padding-global)
+      var(--padding-global);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .sectionTitleExit,
+  .sectionTitleError {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .modalExit {
+    width: 335px;
+    height: 338px;
+    padding: 64px 16px 16px 16px; /* padding з Page Padding */
+    border-radius: 24px;
+  }
+
+  .modalError {
+    width: 335px;
+    height: 386px;
+    padding: 64px 16px 16px 16px;
+    border-radius: 24px;
+  }
+
+  .sectionTitleExit {
+    width: 295px;
+    height: 102px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .sectionTitleError {
+    width: 295px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .headingExit {
+    width: 295px;
+    height: 62px;
+    font-family: "Sora", sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 120%;
+    letter-spacing: -1%;
+    text-align: center;
+    color: var(--Color-Scheme-1-Text, #000);
+    margin: 0;
+  }
+
+  .headingError {
+    width: 295px;
+    height: 62px;
+    font-family: "Sora", sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 120%;
+    letter-spacing: -1%;
+    text-align: center;
+    color: var(--Color-Scheme-1-Text, #000);
+    margin: 0;
+  }
+
+  .textExit {
+    width: 295px;
+    height: 24px;
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 400;
+    line-height: 150%;
+    letter-spacing: 0%;
+    text-align: center;
+    color: var(--Color-Scheme-1-Text, #000);
+    margin: 0;
+    font-size: 16px;
+  }
+
+  .textError {
+    width: 295px;
+    height: 72px;
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 400;
+    font-size: 16px; /* Text Medium */
+    line-height: 150%;
+    letter-spacing: 0%;
+    text-align: center;
+    color: var(--Color-Scheme-1-Text, #000);
+    margin: 0;
+  }
+
+  .formExit {
+    width: 295px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin: 0 auto;
+  }
+
+  .formError {
+    width: 295px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin: 0 auto;
+  }
+
+  .cancelBtnExit,
+  .cancelBtnError {
+    width: 295px;
+    height: 48px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--Color-Scheme-2-Border, rgba(0, 0, 0, 0.15));
+    background: var(--Opacity-Neutral-Darkest-5, rgba(0, 0, 0, 0.05));
+    color: #000; /* чорний текст для Відмінити / Увійти */
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 150%;
+    cursor: pointer;
+  }
+
+  .confirmBtnExit {
+    width: 295px;
+    height: 48px;
+    padding: 6px 12px;
+    border-radius: 8px;
+  }
+
+  .confirmBtnError {
+    width: 295px;
+    height: 48px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--Color-Royal-Blue, rgba(65, 105, 225, 1));
+    background: var(--Color-Royal-Blue, rgba(65, 105, 225, 1));
+    color: #fff; /* білий текст */
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 150%;
+    cursor: pointer;
+  }
+
+  .textButton {
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: 0%;
+    text-align: center;
+  }
+
+  .textButton--dark {
+    color: var(--Color-Neutral-Darkest, rgba(0, 0, 0, 1));
+  }
+
+  .textButton--light {
+    color: var(--Color-White, rgba(255, 255, 255, 1));
+  }
+
+  .textButtonCancel {
+    width: 75px;
+    height: 24px;
+  }
+
+  .textButtonExit {
+    width: 47px;
+    height: 24px;
+  }
+
+  .textButtonLogin {
+    width: 49px;
+    height: 24px;
+  }
+
+  .textButtonRegister {
+    width: 129px;
+    height: 24px;
+  }
+}
