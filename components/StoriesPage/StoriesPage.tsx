@@ -1,9 +1,9 @@
-//import css from "./StoriesPage.module.css";
+import TravellersStories from "@/components/TravellersStories/TravellersStories";
 
 export default function StoriesPage() {
   return (
     <section>
-      <h3>StoriesPage</h3>
+      <TravellersStories />
     </section>
   );
 }

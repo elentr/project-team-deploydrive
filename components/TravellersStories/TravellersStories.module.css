@@ -1,0 +1,105 @@
+.section {
+    padding-top: 64px;
+    padding-bottom: 64px;
+    background-color: #ffffff;
+}
+
+/* Заголовок секції */
+.title {
+    font-family: var(--font-sora-sans), sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #000000;
+    margin-bottom: 32px;
+}
+
+/* Грід карток */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+/* Обгортка для кнопки */
+.buttonWrap {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Кнопка "Переглянути всі" */
+.button {
+    padding: 12px 24px;
+    background-color: #e7ecf3;
+    border: 1px solid #c5ccd7;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.button:hover,
+.button:focus {
+    background-color: #e8eeff;
+    color: #131f43;
+}
+
+.button:active {
+    background-color: #7a96ea;
+}
+
+/* Текст помилки / порожнього стану */
+.error,
+.empty {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #495057;
+}
+
+/* Центрування лоадера */
+.loaderWrap,
+.loaderInline {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+    .section {
+        padding-top: 64px;
+        padding-bottom: 64px;
+    }
+
+    .title {
+        font-size: 32px;
+        margin-bottom: 40px;
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop */
+@media (min-width: 1440px) {
+    .section {
+        padding-top: 72px;
+        padding-bottom: 72px;
+    }
+
+    .title {
+        font-size: 36px;
+    }
+
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .button {
+        font-size: 18px;
+    }
+}
