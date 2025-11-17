@@ -1,33 +1,52 @@
+.loading {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #111322;
+}
+
 .loader {
-  width: 64px;
-  height: 64px;
+  --loader-size: 64px;
+  --loader-bar-width: calc(var(--loader-size) * 0.24);
+  --loader-bar-height: calc(var(--loader-size) * 0.48);
+  --loader-core: calc(var(--loader-size) * 0.09);
+
+  width: var(--loader-size);
+  height: var(--loader-size);
   position: relative;
   background: #f2f2f2;
   border-radius: 50%;
   transform: rotate(45deg);
   animation: rotate 2s linear infinite;
 }
-.loader:before {
+
+.loader::before {
   content: "";
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 15px;
-  height: 30px;
+  width: var(--loader-bar-width);
+  height: var(--loader-bar-height);
   background: #7a96ea;
   transform: skew(5deg, 60deg) translate(-50%, -5%);
 }
 
-.loader:after {
+.loader::after {
   content: "";
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 6px;
-  height: 6px;
+  width: var(--loader-core);
+  height: var(--loader-core);
   border-radius: 50%;
   background: #f2f2f2;
   transform: translate(-50%, -50%);
+}
+
+.text {
+  font-size: 14px;
+  color: #6c7080;
 }
 
 @keyframes rotate {
