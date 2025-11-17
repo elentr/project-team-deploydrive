@@ -5,7 +5,7 @@ import axios from "axios";
 import TravellersStoriesItem from "../TravellersStoriesItem/TravellersStoriesItem";
 import styles from "./TravellersStories.module.css";
 
-import type { Story } from "../TravellersStoriesItem/TravellersStoriesItem";
+import type { Story } from "@/types/story";
 
 interface ApiStory {
   _id: string;
@@ -30,9 +30,11 @@ function mapStory(api: ApiStory): Story {
     category: api.categoryName,
     description: api.article.slice(0, 180) + "...",
     author: "Автор",
-    avatar: "/images/avatar.png",
+    avatar: "/images/avatar.svg",
     date: api.date,
     readTime: 1,
+    bookmarksCount: api.favoriteCount,
+    isSaved: false,
   };
 }
 
