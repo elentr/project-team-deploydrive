@@ -24,43 +24,47 @@ export default function AuthPage({ type }: { type: "login" | "register" }) {
   }, [isAuth, router]);
 
   return (
-    <div className="container">
-      <div className={styles.authWrapper}>
-        {/* Вкладки */}
-        <div className={styles.tabsWrapper}>
-          <Link
-            href="/auth/register"
-            className={`${styles.tab} ${type === "register" ? styles.active : ""}`}
-          >
-            Реєстрація
-          </Link>
+    <>
+      <section>
+        <div className="container">
+          <div className={styles.authWrapper}>
+            {/* Вкладки */}
+            <div className={styles.tabsWrapper}>
+              <Link
+                href="/auth/register"
+                className={`${styles.tab} ${type === "register" ? styles.active : ""}`}
+              >
+                Реєстрація
+              </Link>
 
-          <Link
-            href="/auth/login"
-            className={`${styles.tab} ${type === "login" ? styles.active : ""}`}
-          >
-            Вхід
-          </Link>
+              <Link
+                href="/auth/login"
+                className={`${styles.tab} ${type === "login" ? styles.active : ""}`}
+              >
+                Вхід
+              </Link>
+            </div>
+
+            {/* Заголовки */}
+            {type === "login" ? (
+              <>
+                <h2 className={styles.authTitle}>Вхід</h2>
+                <p className={styles.authSubtitle}>Ласкаво просимо назад!</p>
+              </>
+            ) : (
+              <>
+                <h2 className={styles.authTitle}>Реєстрація</h2>
+                <p className={styles.authSubtitle}>
+                  Раді вас бачити у спільноті мандрівників!
+                </p>
+              </>
+            )}
+
+            {/* Форма */}
+            {type === "login" ? <LoginForm /> : <RegistrationForm />}
+          </div>
         </div>
-
-        {/* Заголовки */}
-        {type === "login" ? (
-          <>
-            <h2 className={styles.authTitle}>Вхід</h2>
-            <p className={styles.authSubtitle}>Ласкаво просимо назад!</p>
-          </>
-        ) : (
-          <>
-            <h2 className={styles.authTitle}>Реєстрація</h2>
-            <p className={styles.authSubtitle}>
-              Раді вас бачити у спільноті мандрівників!
-            </p>
-          </>
-        )}
-
-        {/* Форма */}
-        {type === "login" ? <LoginForm /> : <RegistrationForm />}
-      </div>
-    </div>
+      </section>
+    </>
   );
 }

@@ -7,6 +7,7 @@
   padding: 0 16px;
   overflow-x: hidden;
   box-sizing: border-box;
+  background-color: var(--color-scheme-1-background);
 }
 
 .tabsWrapper {
@@ -135,7 +136,7 @@
   background-color: #2563eb;
 }
 
-/* TABLET */
+/* TABLET 768*/
 
 @media (min-width: 768px) {
   .authWrapper {
@@ -175,7 +176,7 @@
   }
 }
 
-/* DESKTOP  */
+/* DESKTOP  1440*/
 @media (min-width: 1440px) {
   .authWrapper {
     max-width: 644px;

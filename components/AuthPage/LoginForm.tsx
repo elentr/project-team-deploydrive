@@ -3,36 +3,45 @@
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@tanstack/react-query";
+import { login as loginApi } from "@/lib/api/clientApi";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { AxiosError } from "axios";
 import styles from "./AuthPage.module.css";
-import { login } from "@/lib/api/clientApi";
+import { useAuthStore } from "@/lib/store/authStore";
 
 interface LoginRequest {
   email: string;
   password: string;
 }
 
-interface ApiError {
-  response?: { data?: { error?: string } };
-}
+type ApiErrorShape = {
+  message?: string;
+  error?: string;
+  data?: { message?: string };
+};
 
 export default function LoginForm() {
   const router = useRouter();
+  const setUser = useAuthStore((state) => state.setUser);
 
   const validationSchema = Yup.object<LoginRequest>({
     email: Yup.string().email("Некоректна пошта").required("Обов’язкове поле"),
     password: Yup.string().required("Обов’язкове поле"),
   });
 
-  const mutation = useMutation<unknown, ApiError, LoginRequest>({
-    mutationFn: login,
-    onSuccess: () => {
-      toast.success("Вхід успішний!");
+  const mutation = useMutation<any, AxiosError<ApiErrorShape>, LoginRequest>({
+    mutationFn: loginApi,
+    onSuccess: (data) => {
+      setUser(data);
+      toast.success("Логін успішний!");
       router.push("/");
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error ?? "Помилка входу");
+      const data = error.response?.data;
+      const msg =
+        data?.message || data?.error || data?.data?.message || "Помилка логіна";
+      toast.error(msg);
     },
   });
 

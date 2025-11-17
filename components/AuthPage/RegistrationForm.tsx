@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { register } from "@/lib/api/clientApi";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { AxiosError } from "axios";
 import styles from "./AuthPage.module.css";
 
 interface RegisterRequest {
@@ -14,9 +15,11 @@ interface RegisterRequest {
   password: string;
 }
 
-interface ApiError {
-  response?: { data?: { error?: string } };
-}
+type ApiErrorShape = {
+  message?: string;
+  error?: string;
+  data?: { message?: string };
+};
 
 export default function RegistrationForm() {
   const router = useRouter();
@@ -27,14 +30,24 @@ export default function RegistrationForm() {
     password: Yup.string().min(6).required("Обов’язкове поле"),
   });
 
-  const mutation = useMutation<unknown, ApiError, RegisterRequest>({
+  const mutation = useMutation<
+    unknown,
+    AxiosError<ApiErrorShape>,
+    RegisterRequest
+  >({
     mutationFn: register,
     onSuccess: () => {
-      toast.success("Реєстрація успішна!");
+      toast.success("Успішна реєстрація");
       router.push("/");
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error ?? "Помилка реєстрації");
+      const data = error.response?.data;
+      const msg =
+        data?.message ||
+        data?.error ||
+        data?.data?.message ||
+        "Помилка реєстрації";
+      toast.error(msg);
     },
   });
 
