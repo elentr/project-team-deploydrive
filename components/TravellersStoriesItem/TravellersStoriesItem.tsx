@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Icon from "../Icon/Icon";
 import type { Story } from "@/types/story";
 import styles from "./TravellersStoriesItem.module.css";
 
@@ -162,11 +163,8 @@ export default function TravellersStoriesItem({
             {isBookmarkLoading ? (
               <span className={styles.bookmarkLoader} aria-hidden="true" />
             ) : (
-              <Image
-                src={
-                  isSaved ? "/icons/bookmark-filled.svg" : "/icons/bookmark.svg"
-                }
-                alt="Додати в збережені"
+              <Icon
+                name={isSaved ? "icon-bookmark-filled" : "icon-bookmark"}
                 width={24}
                 height={24}
                 className={styles.bookmarkIcon}

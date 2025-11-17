@@ -182,7 +182,8 @@
 }
 
 .bookmarkIcon {
-  transition: filter 0.2s ease;
+  transition: color 0.2s ease;
+  color: #1a73e8;
 }
 
 .bookmarkButtonActive {
@@ -192,7 +193,7 @@
 }
 
 .bookmarkButtonActive .bookmarkIcon {
-  filter: brightness(0) invert(1);
+  color: #ffffff;
 }
 
 .bookmarkLoader {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import cn from "classnames";
 import Loader from "../Loader/Loader";
 import TravellersStoriesItem from "../TravellersStoriesItem/TravellersStoriesItem";
 import styles from "./Popular.module.css";
@@ -88,10 +89,9 @@ export default function Popular() {
 
   if (!API) {
     return (
-      <section className={styles.section}>
+      <section className={cn(styles.section, "container")}>
         <div className={styles.header}>
           <div>
-            <p className={styles.overline}>Travellers</p>
             <h2 className={styles.title}>Популярні історії</h2>
             <p className={styles.subtitle}>
               Надихніться подорожами інших та поділіться своєю історією.
@@ -108,10 +108,9 @@ export default function Popular() {
   }
 
   return (
-    <section className={styles.section}>
+    <section className={cn(styles.section, "container")}>
       <div className={styles.header}>
         <div>
-          <p className={styles.overline}>Travellers</p>
           <h2 className={styles.title}>Популярні історії</h2>
           <p className={styles.subtitle}>
             Надихніться подорожами інших та поділіться своєю історією.
