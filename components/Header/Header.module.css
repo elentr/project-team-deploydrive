@@ -12,6 +12,7 @@
 
 .container {
   width: 100%;
+  min-width: unset;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -27,6 +28,7 @@
   font-size: 17px;
   letter-spacing: -0.01em;
   color: #000;
+  line-height: normal;
 }
 
 .burger {
@@ -45,12 +47,12 @@
 
 .menuPrimary {
   fill: #000000;
-  stroke: #000000;  
+  stroke: #000000;
 }
 
 .menuSecondary {
-    fill: #ffffff;   
-    stroke: #ffffff;  
+  fill: #ffffff;
+  stroke: #ffffff;
 }
 
 .nav {
@@ -130,12 +132,8 @@
   padding-right: 8px;
 }
 
-.logoutBtn svg {
-  fill: #000000;
-}
-
 .logoutBtn span::before {
-  content: "";
+  content: '';
   position: absolute;
   right: 0;
   top: 0;
@@ -171,7 +169,7 @@
 }
 
 .btn_2:active {
-  background-color:  #131f43;
+  background-color: #131f43;
 }
 
 .btn_1 {
@@ -200,9 +198,7 @@
 
 .btn_1:active {
   background-color: #7a96ea;
-  color: #131f43;
 }
-
 
 .logout {
   background: none;
@@ -219,7 +215,14 @@
 /* ---------- Secondary theme ---------- */
 
 .secondary.header {
+  position: absolute; /* теперь хедер не занимает место в потоке */
+  top: 0;
+  left: 0;
   background-color: transparent;
+}
+
+.secondary.primary {
+  background-color: #ffffff;
 }
 
 .secondary .logo {
@@ -248,6 +251,15 @@
   border-radius: 8px;
   padding: 4px;
   cursor: pointer;
+}
+
+.secondary.header.open .burger {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.secondary.header.open .logo {
+  color: #000;
 }
 
 @media (min-width: 768px) {
@@ -321,10 +333,6 @@
     color: #f7f9ff;
   }
 
-  .secondary .logoutBtn svg {
-    fill: #ffffff;
-  }
-
   .secondary .btn_1 {
     color: #000000;
     background-color: #ffffff;
@@ -347,8 +355,6 @@
     border-color: rgba(255, 255, 255, 0);
   }
 
-
-
   .secondary .btn_2:hover,
   .secondary .btn_2:focus {
     color: #000000;
@@ -356,7 +362,7 @@
     border-color: rgba(255, 255, 255, 0);
   }
 
-  .secondary .btn_2:active{
+  .secondary .btn_2:active {
     background-color: #7a96ea;
   }
 }
