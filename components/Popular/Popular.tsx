@@ -5,7 +5,8 @@ import cn from "classnames";
 import Loader from "../Loader/Loader";
 import TravellersStoriesItem from "../TravellersStoriesItem/TravellersStoriesItem";
 import styles from "./Popular.module.css";
-import type { Story } from "@/types/story";
+import type { Story, ApiStory } from "@/types/story";
+import { mapStory } from "@/types/story";
 
 const LIMIT = 3;
 
@@ -36,12 +37,39 @@ export default function Popular() {
       }
 
       const data = await res.json();
-      const incoming: Story[] = data.stories ?? [];
+      
+      // Логування для дебагу (можна прибрати після перевірки)
+      console.log("API Response:", data);
+      
+      // Перевіряємо різні можливі структури відповіді
+      let rawStories: ApiStory[] = [];
+      
+      if (data.stories && Array.isArray(data.stories)) {
+        rawStories = data.stories;
+      } else if (data.data && data.data.data && Array.isArray(data.data.data)) {
+        rawStories = data.data.data;
+      } else if (data.data && Array.isArray(data.data)) {
+        rawStories = data.data;
+      } else if (Array.isArray(data)) {
+        rawStories = data;
+      }
 
-      setStories((prev) => [...prev, ...incoming]);
+      console.log("Raw stories:", rawStories);
 
-      if (incoming.length < LIMIT) {
-        setHasMore(false);
+      // Мапимо дані з API до формату Story
+      const incoming: Story[] = rawStories.map(mapStory);
+      
+      console.log("Mapped stories:", incoming);
+
+      // Якщо це перша сторінка, замінюємо дані, інакше додаємо
+      if (page === 1) {
+        setStories(incoming);
+        setHasMore(incoming.length >= LIMIT);
+      } else {
+        setStories((prev) => [...prev, ...incoming]);
+        if (incoming.length < LIMIT) {
+          setHasMore(false);
+        }
       }
     } catch (error) {
       console.error("Помилка завантаження:", error);
