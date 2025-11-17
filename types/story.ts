@@ -28,6 +28,8 @@ export interface Story {
   readTime: number;
   img: string;
   avatar?: string;
+  bookmarksCount?: number;
+  isSaved?: boolean;
 }
 
 export const mapStory = (s: ApiStory): Story => ({
@@ -40,5 +42,7 @@ export const mapStory = (s: ApiStory): Story => ({
   author: "Автор", // заглушка, якщо немає автора з бекенду
   date: s.date,
   readTime: 1,
-  avatar: "/images/avatar.png",
+  avatar: "/images/avatar.svg",
+  bookmarksCount: s.favoriteCount,
+  isSaved: false,
 });

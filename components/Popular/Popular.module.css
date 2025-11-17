@@ -1,41 +1,80 @@
 .section {
+  margin-top: 40px;
   display: flex;
   flex-direction: column;
   gap: 32px;
-  margin-top: 64px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .title {
-  font-size: 32px;
+  font-size: clamp(28px, 4vw, 40px);
   font-weight: 700;
-  margin-bottom: 12px;
+  margin: 0;
+  color: #111322;
 }
 
-.grid {
+.subtitle {
+  margin: 0;
+  color: #5f6774;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.list {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 32px;
 }
 
-@media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1440px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.emptyState {
+  margin: 0;
+  padding: 40px;
+  border-radius: 16px;
+  background: #f7f8fb;
+  text-align: center;
+  color: #5c6473;
 }
 
 .button {
-  width: fit-content;
-  padding: 14px 28px;
-  background: #e7ecf3;
-  border: 1px solid #c5ccd7;
-  border-radius: 16px;
-  font-size: 16px;
-  cursor: pointer;
   margin: 0 auto;
+  padding: 14px 28px;
+  background: #1a73e8;
+  color: #fff;
+  font-size: 16px;
+  border-radius: 12px;
+  border: none;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(26, 115, 232, 0.25);
+}
+
+.button:hover {
+  background: #155bc0;
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.button:focus-visible {
+  outline: 3px solid #8cb8ff;
+  outline-offset: 4px;
+}
+
+.loaderWrapper {
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loaderBottom {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 8px;
 }
