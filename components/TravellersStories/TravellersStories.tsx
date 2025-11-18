@@ -80,14 +80,12 @@ export default function TravellersStories({
     const data = await res.json();
     const items = data.data.data.map(mapStory);
 
-    // додаємо у глобальний список
     setAllStories(prev => [...prev, ...items]);
     setHasMore(data.data.hasNextPage);
   }, []);
 
   // ----------- INITIAL LOAD -----------
   useEffect(() => {
-    // Якщо stories передані ззовні, не робимо запит
     if (externalStories !== undefined) {
       return;
     }
@@ -97,9 +95,7 @@ export default function TravellersStories({
   }, [fetchPage, externalStories]);
 
   // ----------- UPDATE VISIBLE LIST -----------
-  // Обчислюємо visibleStories через useMemo замість useEffect для уникнення каскадних рендерів
   const visibleStories = useMemo(() => {
-    // Якщо stories передані ззовні, використовуємо їх напряму
     if (externalStories !== undefined) {
       return externalStories;
     }
@@ -120,7 +116,6 @@ export default function TravellersStories({
 
   // ----------- LOAD MORE -----------
   const loadMore = async () => {
-    // Якщо є зовнішній обробник, використовуємо його
     if (onLoadMore) {
       onLoadMore();
       return;
@@ -129,13 +124,11 @@ export default function TravellersStories({
     const next = page + 1;
     setPage(next);
 
-    // якщо нам НЕ вистачає карток — догружаємо наступну сторінку
     if (allStories.length < next * SHOW_PER_PAGE) {
       await fetchPage(next);
     }
   };
 
-  // Визначаємо, які stories показувати
   const displayStories = externalStories !== undefined ? externalStories : visibleStories;
   const displayHasMore = externalHasMore !== undefined ? externalHasMore : hasMore;
   const displayLoading = externalLoading !== undefined ? externalLoading : false;

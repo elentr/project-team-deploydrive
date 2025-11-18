@@ -37,7 +37,6 @@ export default function Popular() {
 
       const data = await res.json();
       
-      // Перевіряємо різні можливі структури відповіді
       let rawStories: ApiStory[] = [];
       
       if (data.stories && Array.isArray(data.stories)) {
@@ -50,10 +49,8 @@ export default function Popular() {
         rawStories = data;
       }
 
-      // Мапимо дані з API до формату Story
       const incoming: Story[] = rawStories.map(mapStory);
 
-      // Якщо це перша сторінка, замінюємо дані, інакше додаємо
       if (page === 1) {
         setStories(incoming);
         setHasMore(incoming.length >= LIMIT);
