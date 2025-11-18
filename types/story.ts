@@ -8,55 +8,6 @@ export type CreateStoryResponse = {
 id: string; 
 };
 
-              
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export interface Story {
   _id: string;
