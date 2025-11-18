@@ -1,4 +1,3 @@
-// lib/api/clientApi.ts
 import { apiClient } from "./api";
 import type { User } from "@/types/user";
 
@@ -24,3 +23,20 @@ export const checkSession = async (): Promise<boolean> => {
     return false;
   }
 };
+
+// export const getStories = (
+//   params: Record<string, string | number | undefined> = {}
+// ) => {
+//   const sp = new URLSearchParams();
+//   Object.entries(params).forEach(([k, v]) => {
+//     if (v != null) sp.append(k, String(v));
+//   });
+//   return apiClient
+//     .get<PaginatedStoriesResponse>(`/stories${sp.toString() ? "?" + sp : ""}`)
+//     .then((r) => r.data);
+// };
+
+// export const getPopularStories = (page = 1, limit = 3) =>
+//   apiClient
+//     .get<{ stories: Story[] }>(`/stories/popular?page=${page}&limit=${limit}`)
+//     .then((r) => r.data.stories);
