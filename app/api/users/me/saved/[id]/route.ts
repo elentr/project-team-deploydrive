@@ -1,27 +1,27 @@
 import { NextResponse } from "next/server";
 
 import { cookies } from "next/headers";
-import { logErrorResponse } from "@/app/api/_utils/utils;
 import { isAxiosError } from "axios";
 import { api } from "../../../../api";
 
-type Props = {
-  params: Promise<{ id: string }>;
+type ApiErrorResponse = {
+  error?: string;
+  message?: string;
 };
 
+// === GET /api/users/me ===
 export async function GET() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+
+  if (!token) {
+    return NextResponse.json({ error: "Не авторизовано" }, { status: 401 });
+  }
+
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { error: "Не авторизовано" },
-        { status: 401 }
-      );
-    }
-
-    const res = await api.get("/users/me", {
+    const res = await api.get<{
+      user: { id: string; name: string; email: string };
+    }>("/users/me", {
       headers: {
         Cookie: cookieStore.toString(),
         Authorization: `Bearer ${token}`,
@@ -29,22 +29,47 @@ export async function GET() {
     });
 
     return NextResponse.json(res.data);
-  } catch (error: any) {
-    console.error("GET /api/users/me error:", error);
+  } catch (error) {
+    // Типобезпечна перевірка
+    if (isAxiosError<ApiErrorResponse>(error)) {
+      console.error(
+        "Axios error /users/me:",
+        error.response?.data || error.message
+      );
+      return NextResponse.json(
+        {
+          error:
+            error.response?.data?.error || "Не вдалося отримати користувача",
+        },
+        { status: error.response?.status || 401 }
+      );
+    }
+
+    // Неочікувана помилка (мережа, синтаксис тощо)
+    console.error("Unexpected error /users/me:", error);
     return NextResponse.json(
-      { error: "Не вдалося отримати користувача" },
-      { status: 401 }
+      { error: "Внутрішня помилка сервера" },
+      { status: 500 }
     );
   }
 }
 
-export async function POST(request: Request, { params }: Props) {
-  try {
-    const cookieStore = await cookies();
-    const { id } = await params;
-    const body = await request.json();
+// === POST /api/users/me → додати в збережене (якщо id в body) ===
+export async function POST(request: Request) {
+  const cookieStore = await cookies();
 
-    const res = await api.post(`/users/saved/${id}`, body, {
+  try {
+    const body = await request.json();
+    const storyId = body.id || body.storyId;
+
+    if (!storyId) {
+      return NextResponse.json(
+        { error: "ID історії обов'язковий" },
+        { status: 400 }
+      );
+    }
+
+    const res = await api.post(`/users/saved/${storyId}`, body, {
       headers: {
         Cookie: cookieStore.toString(),
         "Content-Type": "application/json",
@@ -53,43 +78,51 @@ export async function POST(request: Request, { params }: Props) {
 
     return NextResponse.json(res.data, { status: res.status });
   } catch (error) {
-    if (isAxiosError(error)) {
-      logErrorResponse(error.response?.data);
+    if (isAxiosError<ApiErrorResponse>(error)) {
       return NextResponse.json(
-        { error: error.message, response: error.response?.data },
-        { status: error.status }
+        { error: error.response?.data?.error || "Помилка збереження" },
+        { status: error.response?.status || 400 }
       );
     }
-    logErrorResponse({ message: (error as Error).message });
+
+    console.error("POST /users/saved error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Внутрішня помилка сервера" },
       { status: 500 }
     );
   }
 }
 
-export async function DELETE(request: Request, { params }: Props) {
+// === DELETE /api/users/me → видалити зі збережених ===
+export async function DELETE(request: Request) {
+  const cookieStore = await cookies();
+
   try {
-    const cookieStore = await cookies();
-    const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "ID обов'язковий" }, { status: 400 });
+    }
 
     const res = await api.delete(`/users/saved/${id}`, {
       headers: {
         Cookie: cookieStore.toString(),
       },
     });
+
     return NextResponse.json(res.data, { status: res.status });
   } catch (error) {
-    if (isAxiosError(error)) {
-      logErrorResponse(error.response?.data);
+    if (isAxiosError<ApiErrorResponse>(error)) {
       return NextResponse.json(
-        { error: error.message, response: error.response?.data },
-        { status: error.status }
+        { error: error.response?.data?.error || "Помилка видалення" },
+        { status: error.response?.status || 400 }
       );
     }
-    logErrorResponse({ message: (error as Error).message });
+
+    console.error("DELETE /users/saved error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Внутрішня помилка сервера" },
       { status: 500 }
     );
   }

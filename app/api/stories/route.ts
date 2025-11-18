@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const page = Number(request.nextUrl.searchParams.get("page") ?? 1);
-    const rawCategory = request.nextUrl.searchParams.get("categery") ?? "";
+    const rawCategory = request.nextUrl.searchParams.get("category") ?? "";
     const category = rawCategory === "All" ? "" : rawCategory;
 
     const res = await api("/stories", {
