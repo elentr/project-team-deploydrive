@@ -1,3 +1,4 @@
+// components/AuthPage/AuthPage.tsx
 "use client";
 
 import { useEffect } from "react";
@@ -12,59 +13,60 @@ import RegistrationForm from "./RegistrationForm";
 export default function AuthPage({ type }: { type: "login" | "register" }) {
   const router = useRouter();
 
-  // 🔥 Перевірка сесії
-  const { data: isAuth } = useQuery({
+  // Перевірка, чи вже залогінений
+  const { data: isAuthenticated, isLoading } = useQuery({
     queryKey: ["session"],
     queryFn: checkSession,
+    staleTime: Infinity,
   });
 
-  // 🔥 Редірект, якщо залогінений
   useEffect(() => {
-    if (isAuth) router.replace("/");
-  }, [isAuth, router]);
+    if (isAuthenticated === true) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, router]);
+
+  if (isLoading) return null;
 
   return (
-    <>
-      <section>
-        <div className="container">
-          <div className={styles.authWrapper}>
-            {/* Вкладки */}
-            <div className={styles.tabsWrapper}>
-              <Link
-                href="/auth/register"
-                className={`${styles.tab} ${type === "register" ? styles.active : ""}`}
-              >
-                Реєстрація
-              </Link>
-
-              <Link
-                href="/auth/login"
-                className={`${styles.tab} ${type === "login" ? styles.active : ""}`}
-              >
-                Вхід
-              </Link>
-            </div>
-
-            {/* Заголовки */}
-            {type === "login" ? (
-              <>
-                <h2 className={styles.authTitle}>Вхід</h2>
-                <p className={styles.authSubtitle}>Ласкаво просимо назад!</p>
-              </>
-            ) : (
-              <>
-                <h2 className={styles.authTitle}>Реєстрація</h2>
-                <p className={styles.authSubtitle}>
-                  Раді вас бачити у спільноті мандрівників!
-                </p>
-              </>
-            )}
-
-            {/* Форма */}
-            {type === "login" ? <LoginForm /> : <RegistrationForm />}
+    <section>
+      <div className="container">
+        <div className={styles.authWrapper}>
+          {/* Табы */}
+          <div className={styles.tabsWrapper}>
+            <Link
+              href="/auth/register"
+              className={`${styles.tab} ${type === "register" ? styles.active : ""}`}
+            >
+              Реєстрація
+            </Link>
+            <Link
+              href="/auth/login"
+              className={`${styles.tab} ${type === "login" ? styles.active : ""}`}
+            >
+              Вхід
+            </Link>
           </div>
+
+          {/* Заголовки */}
+          {type === "login" ? (
+            <>
+              <h2 className={styles.authTitle}>Вхід</h2>
+              <p className={styles.authSubtitle}>Ласкаво просимо назад!</p>
+            </>
+          ) : (
+            <>
+              <h2 className={styles.authTitle}>Реєстрація</h2>
+              <p className={styles.authSubtitle}>
+                Раді вас бачити у спільноті мандрівників!
+              </p>
+            </>
+          )}
+
+          {/* Форма */}
+          {type === "login" ? <LoginForm /> : <RegistrationForm />}
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }

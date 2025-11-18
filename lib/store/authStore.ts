@@ -1,37 +1,34 @@
-import { User } from "@/types/user";
 import { create } from "zustand";
+import { getMe } from "@/lib/api/clientApi";
+import type { User } from "@/types/user";
 
-type AuthStore = {
-  isAuthenticated: boolean;
+interface AuthState {
   user: User | null;
+  isAuthenticated: boolean;
   isLoading: boolean;
   setUser: (user: User) => void;
-  clearUser: () => void;
-  setLoading: (loading: boolean) => void;
-};
+  logout: () => void;
+  init: () => Promise<void>;
+}
 
-export const useAuthStore = create<AuthStore>()((set) => ({
-  isAuthenticated: false,
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  isLoading: false,
+  isAuthenticated: false,
+  isLoading: true,
 
-  setUser: (user: User) => {
-    set(() => ({
-      user,
-      isAuthenticated: true,
-      isLoading: false,
-    }));
-  },
+  setUser: (user) => set({ user, isAuthenticated: true, isLoading: false }),
 
-  clearUser: () => {
-    set(() => ({
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-    }));
-  },
+  logout: () => set({ user: null, isAuthenticated: false }),
 
-  setLoading: (loading: boolean) => {
-    set(() => ({ isLoading: loading }));
+  init: async () => {
+    set({ isLoading: true });
+    try {
+      const user = await getMe();
+      set({ user, isAuthenticated: true });
+    } catch {
+      set({ user: null, isAuthenticated: false });
+    } finally {
+      set({ isLoading: false });
+    }
   },
 }));

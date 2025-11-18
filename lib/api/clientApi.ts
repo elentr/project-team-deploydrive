@@ -1,52 +1,26 @@
+// lib/api/clientApi.ts
 import { apiClient } from "./api";
 import type { User } from "@/types/user";
 
-export const authService = {
-  async getSession(): Promise<User | null> {
-    try {
-      const { data } = await apiClient.get("/users/me/profile");
-      return data;
-    } catch {
-      return null;
-    }
-  },
-};
-
-export interface RegisterRequest {
+export const register = (data: {
   name: string;
   email: string;
   password: string;
-}
+}) => apiClient.post<User>("/auth/register", data).then((r) => r.data);
 
-export type LoginRequest = {
-  email: string;
-  password: string;
-};
+export const login = (data: { email: string; password: string }) =>
+  apiClient.post<User>("/auth/login", data).then((r) => r.data);
 
-type CheckSessionRequest = {
-  success: boolean;
-};
+export const logout = () => apiClient.post("/auth/logout");
 
-export const checkSession = async () => {
-  const response = await apiClient.get<CheckSessionRequest>("/auth/session");
-  return response.data.success;
-};
+export const getMe = (): Promise<User> =>
+  apiClient.get<User>("/users/me").then((r) => r.data);
 
-export const register = async (data: RegisterRequest): Promise<User> => {
-  const response = await apiClient.post<User>("/auth/register", data);
-  return response.data;
-};
-
-export const login = async (data: LoginRequest): Promise<User> => {
-  const response = await apiClient.post<User>("/auth/login", data);
-  return response.data;
-};
-
-export const logout = async (): Promise<void> => {
-  await apiClient.post("/auth/logout");
-};
-
-export const getMe = async () => {
-  const { data } = await apiClient.get<User>("/users/me");
-  return data;
+export const checkSession = async (): Promise<boolean> => {
+  try {
+    await apiClient.get("/users/me");
+    return true;
+  } catch {
+    return false;
+  }
 };

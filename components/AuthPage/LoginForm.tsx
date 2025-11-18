@@ -1,66 +1,58 @@
 "use client";
 
-import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@tanstack/react-query";
-import { login as loginApi } from "@/lib/api/clientApi";
+import { login } from "@/lib/api/clientApi";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import { AxiosError } from "axios";
-import styles from "./AuthPage.module.css";
 import { useAuthStore } from "@/lib/store/authStore";
+import toast from "react-hot-toast";
+import type { AxiosError } from "axios";
+import type { User } from "@/types/user";
+import styles from "./AuthPage.module.css";
 
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-type ApiErrorShape = {
-  message?: string;
-  error?: string;
-  data?: { message?: string };
-};
+const schema = Yup.object({
+  email: Yup.string().email("Некоректна пошта").required("Введіть пошту"),
+  password: Yup.string()
+    .min(8, "Мінімум 8 символів")
+    .required("Введіть пароль"),
+});
 
 export default function LoginForm() {
   const router = useRouter();
-  const setUser = useAuthStore((state) => state.setUser);
+  const setUser = useAuthStore((s) => s.setUser);
 
-  const validationSchema = Yup.object<LoginRequest>({
-    email: Yup.string().email("Некоректна пошта").required("Обов’язкове поле"),
-    password: Yup.string().required("Обов’язкове поле"),
-  });
-
-  const mutation = useMutation<any, AxiosError<ApiErrorShape>, LoginRequest>({
-    mutationFn: loginApi,
-    onSuccess: (data) => {
-      setUser(data);
-      toast.success("Логін успішний!");
-      router.push("/");
+  const mutation = useMutation<
+    User,
+    AxiosError<{ message: string }>,
+    { email: string; password: string }
+  >({
+    mutationFn: login,
+    onSuccess: (user) => {
+      setUser(user);
+      toast.success(`З поверненням, ${user.name || "мандрівнику"}! 🌍`);
+      router.replace("/");
     },
     onError: (error) => {
-      const data = error.response?.data;
-      const msg =
-        data?.message || data?.error || data?.data?.message || "Помилка логіна";
+      const msg = error.response?.data?.message || "Невірна пошта або пароль";
       toast.error(msg);
     },
   });
 
-  const handleSubmit = (
-    values: LoginRequest,
-    { setSubmitting }: FormikHelpers<LoginRequest>
-  ) => {
-    mutation.mutate(values, {
-      onSettled: () => setSubmitting(false),
-    });
-  };
-
   return (
-    <Formik<LoginRequest>
-      initialValues={{ email: "", password: "" }}
-      validationSchema={validationSchema}
-      onSubmit={handleSubmit}
+    <Formik
+      initialValues={{
+        email: "",
+        password: "",
+      }}
+      validationSchema={schema}
+      onSubmit={(values, { setSubmitting }) => {
+        mutation.mutate(values, {
+          onSettled: () => setSubmitting(false),
+        });
+      }}
     >
-      {({ errors, touched, values }) => (
+      {({ isSubmitting, touched, errors, values }) => (
         <Form className={styles.form}>
           <div className={styles.formInfoInput}>
             <label className={styles.label}>Пошта*</label>
@@ -69,7 +61,7 @@ export default function LoginForm() {
               type="email"
               className={`${styles.input}
                 ${touched.email && errors.email ? styles.inputError : ""}
-                ${values.email ? styles.inputFilled : ""}`}
+                ${values.email && !errors.email ? styles.inputFilled : ""}`}
             />
             <ErrorMessage
               name="email"
@@ -85,7 +77,7 @@ export default function LoginForm() {
               type="password"
               className={`${styles.input}
                 ${touched.password && errors.password ? styles.inputError : ""}
-                ${values.password ? styles.inputFilled : ""}`}
+                ${values.password && !errors.password ? styles.inputFilled : ""}`}
             />
             <ErrorMessage
               name="password"
@@ -96,10 +88,10 @@ export default function LoginForm() {
 
           <button
             type="submit"
+            disabled={isSubmitting || mutation.isPending}
             className={styles.submitBtn}
-            disabled={mutation.isPending}
           >
-            {mutation.isPending ? "Перевірка даних..." : "Увійти"}
+            {mutation.isPending ? "Вхід..." : "Увійти"}
           </button>
         </Form>
       )}

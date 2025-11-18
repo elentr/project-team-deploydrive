@@ -1,72 +1,64 @@
 "use client";
 
-import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { register } from "@/lib/api/clientApi";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/store/authStore";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
+import type { User } from "@/types/user";
 import styles from "./AuthPage.module.css";
 
-interface RegisterRequest {
-  name: string;
-  email: string;
-  password: string;
-}
-
-type ApiErrorShape = {
-  message?: string;
-  error?: string;
-  data?: { message?: string };
-};
+const schema = Yup.object({
+  name: Yup.string().max(32, "Максимум 32 символи").required("Введіть ім’я"),
+  email: Yup.string()
+    .email("Некоректна пошта")
+    .max(64, "Максимум 64 символи")
+    .required("Введіть пошту"),
+  password: Yup.string()
+    .min(8, "Мінімум 8 символів")
+    .max(128, "Максимум 128 символів")
+    .required("Введіть пароль"),
+});
 
 export default function RegistrationForm() {
   const router = useRouter();
-
-  const validationSchema = Yup.object<RegisterRequest>({
-    name: Yup.string().required("Обов’язкове поле"),
-    email: Yup.string().email("Некоректна пошта").required("Обов’язкове поле"),
-    password: Yup.string().min(6).required("Обов’язкове поле"),
-  });
+  const setUser = useAuthStore((s) => s.setUser);
 
   const mutation = useMutation<
-    unknown,
-    AxiosError<ApiErrorShape>,
-    RegisterRequest
+    User,
+    AxiosError<{ message: string }>,
+    { name: string; email: string; password: string }
   >({
     mutationFn: register,
-    onSuccess: () => {
-      toast.success("Успішна реєстрація");
-      router.push("/");
+    onSuccess: (user) => {
+      setUser(user);
+      toast.success(`Вітаємо, ${user.name}! 🎉`);
+      router.replace("/");
     },
     onError: (error) => {
-      const data = error.response?.data;
-      const msg =
-        data?.message ||
-        data?.error ||
-        data?.data?.message ||
-        "Помилка реєстрації";
+      const msg = error.response?.data?.message || "Помилка реєстрації";
       toast.error(msg);
     },
   });
 
-  const handleSubmit = (
-    values: RegisterRequest,
-    { setSubmitting }: FormikHelpers<RegisterRequest>
-  ) => {
-    mutation.mutate(values, {
-      onSettled: () => setSubmitting(false),
-    });
-  };
-
   return (
-    <Formik<RegisterRequest>
-      initialValues={{ name: "", email: "", password: "" }}
-      validationSchema={validationSchema}
-      onSubmit={handleSubmit}
+    <Formik
+      initialValues={{
+        name: "",
+        email: "",
+        password: "",
+      }}
+      validationSchema={schema}
+      onSubmit={(values, { setSubmitting }) => {
+        mutation.mutate(values, {
+          onSettled: () => setSubmitting(false),
+        });
+      }}
     >
-      {({ errors, touched, values }) => (
+      {({ isSubmitting, touched, errors, values }) => (
         <Form className={styles.form}>
           <div className={styles.formInfoInput}>
             <label className={styles.label}>Ім’я та Прізвище*</label>
@@ -74,7 +66,7 @@ export default function RegistrationForm() {
               name="name"
               className={`${styles.input}
                 ${touched.name && errors.name ? styles.inputError : ""}
-                ${values.name ? styles.inputFilled : ""}`}
+                ${values.name && !errors.name ? styles.inputFilled : ""}`}
             />
             <ErrorMessage
               name="name"
@@ -90,7 +82,7 @@ export default function RegistrationForm() {
               type="email"
               className={`${styles.input}
                 ${touched.email && errors.email ? styles.inputError : ""}
-                ${values.email ? styles.inputFilled : ""}`}
+                ${values.email && !errors.email ? styles.inputFilled : ""}`}
             />
             <ErrorMessage
               name="email"
@@ -106,7 +98,7 @@ export default function RegistrationForm() {
               type="password"
               className={`${styles.input}
                 ${touched.password && errors.password ? styles.inputError : ""}
-                ${values.password ? styles.inputFilled : ""}`}
+                ${values.password && !errors.password ? styles.inputFilled : ""}`}
             />
             <ErrorMessage
               name="password"
@@ -117,8 +109,8 @@ export default function RegistrationForm() {
 
           <button
             type="submit"
+            disabled={isSubmitting || mutation.isPending}
             className={styles.submitBtn}
-            disabled={mutation.isPending}
           >
             {mutation.isPending ? "Реєстрація..." : "Зареєструватись"}
           </button>
