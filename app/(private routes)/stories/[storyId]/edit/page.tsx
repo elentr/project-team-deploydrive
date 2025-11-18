@@ -3,7 +3,7 @@
 import css from "./EditPage.module.css";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader/Loader";
-import { getStories } from "@/lib/api/clientApi";
+import { getStoriesForEdit } from "@/lib/api/clientApi";
 import { useQuery } from "@tanstack/react-query";
 import StoryForm from "@/components/AddStoryForm/AddStoryForm";
 import type { Story } from "@/types/story";
@@ -14,7 +14,7 @@ const EditStory = ({ params }: { params: { id: string } }) => {
 
   const { data: stories, isLoading } = useQuery<Story[]>({
     queryKey: ["stories"],
-    queryFn: () => getStories(),
+    queryFn: () => getStoriesForEdit(),
   });
 
   if (isLoading) return <Loader />;

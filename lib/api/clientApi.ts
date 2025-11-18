@@ -37,7 +37,7 @@ clientApi.interceptors.request.use((config) => {
 });
 
 
-export async function getStories(): Promise<Story[]> {
+export async function getStoriesForEdit(): Promise<Story[]> {
   try {
     const res = await clientApi.get('/api/stories')
 
