@@ -1,0 +1,57 @@
+.providercontainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+
+  background: var(--color-scheme-1-background);
+}
+
+.content {
+  flex: 1;
+}
+
+.logowrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 18px 20px;
+
+  padding: 0px 20px;
+}
+
+.logo {
+  margin-right: 3px;
+}
+
+.link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.text {
+  font-family: "Sora", sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.textwrapper {
+  display: flex;
+  justify-content: center;
+  height: 72px;
+  padding: 16px 0;
+  margin: 0 auto;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: auto;
+}
+
+@media screen and (min-width: 768px) {
+}
+
+@media screen and (min-width: 1440px) {
+}

@@ -30,15 +30,27 @@ export interface Story {
   avatar?: string;
 }
 
+export interface PaginatedStoriesResponse {
+  data: Story[];
+  totalPages: number;
+  totalItems: number;
+  page: number;
+  perPage: number;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
+}
+
 export const mapStory = (s: ApiStory): Story => ({
   _id: s._id,
   title: s.title,
   img: s.img,
   description:
-    s.article.length > 200 ? s.article.slice(0, 200) + "..." : s.article,
+    s.article.length > 200 ? s.article.slice(0, 200) + '...' : s.article,
   category: s.categoryName,
-  author: "Автор", // заглушка, якщо немає автора з бекенду
+  author: 'Автор', // заглушка, якщо немає автора з бекенду
   date: s.date,
   readTime: 1,
-  avatar: "/images/avatar.png",
+  avatar: '/images/avatar.png',
 });
+
+export {};
