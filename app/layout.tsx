@@ -5,6 +5,7 @@ import "./globals.css";
 import TanStackProvider from "../components/TanStackProvider/TanStackProvider";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
+import TravellersPage from "@/components/TravellersPage/TravellersPage";
 
 const nunito = Nunito_Sans({
   variable: "--font-nunito-sans",
