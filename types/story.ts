@@ -9,6 +9,17 @@ export type CreateStoryResponse = {
   id: string;
 };
 
+export type ApiStory = {
+  _id: string;
+  img: string;
+  title: string;
+  article: string;
+  categoryName: string;
+  date: string;
+  ownerId: string;
+  favoriteCount: number;
+};
+
 export interface Story {
   _id: string;
   category: string;
@@ -30,3 +41,16 @@ export type PaginatedStoriesResponse = {
   hasPreviousPage: boolean;
   data: Story[];
 };
+
+export const mapStory = (s: ApiStory): Story => ({
+  _id: s._id,
+  title: s.title,
+  img: s.img,
+  description:
+    s.article.length > 200 ? s.article.slice(0, 200) + '...' : s.article,
+  category: s.categoryName,
+  author: 'Автор', // заглушка, якщо бекенд не віддає ім'я автора
+  date: s.date,
+  readTime: 1,
+  avatar: '/images/avatar.png',
+});

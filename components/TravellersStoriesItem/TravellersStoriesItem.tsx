@@ -1,5 +1,5 @@
-import Image from "next/image";
-import styles from "./TravellersStoriesItem.module.css";
+import Image from 'next/image';
+import styles from './TravellersStoriesItem.module.css';
 
 export interface Story {
   _id: string;
@@ -46,8 +46,8 @@ export default function TravellersStoriesItem({ story }: Props) {
 
       <div className={styles.authorBox}>
         <Image
-          src={story.avatar || "/images/avatar.png"}
-          alt={story.author}
+          src={story.avatar || '/images/avatar.png'}
+          alt={`Аватар автора ${story.author}`}
           width={32}
           height={32}
           className={styles.avatar}

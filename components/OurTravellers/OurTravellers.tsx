@@ -1,60 +1,62 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import axios from "axios";
-import TravellersList from "../TravellersList/TravellersList";
-import styles from "./OurTravellers.module.css";
-import cn from "classnames";
-import type { Traveller } from "@/types/traveller";
-import Loader from "../Loader/Loader";
-
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import TravellersList from '../TravellersList/TravellersList';
+import styles from './OurTravellers.module.css';
+import cn from 'classnames';
+import type { Traveller } from '@/types/traveller';
+import Loader from '../Loader/Loader';
 
 const INITIAL = 4; // первые 4 мандрівники
-const LOAD = 3;    // подгружаем по 3
+const LOAD = 3; // подгружаем по 3
 
 export default function OurTravellers() {
-    const [travellers, setTravellers] = useState<Traveller[]>([]);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const [loading, setLoading] = useState(false);
+  const [travellers, setTravellers] = useState<Traveller[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-    const fetchTravellers = async () => {
-        if (!hasMore || loading) return;
+  const API_URL = 'https://travellers-node.onrender.com';
 
-        try {
-        setLoading(true);
+  const fetchTravellers = async () => {
+    if (!hasMore || loading) return;
 
-        const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
-            {
-                params: {
-                    page,
-                    perPage: page === 1 ? INITIAL : LOAD,
-                },
-            }
-        );
+    try {
+      setLoading(true);
 
-        const { data, hasNextPage } = res.data.data;
+      const res = await axios.get(
+        // `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
+        `${API_URL}/api/users`,
+        {
+          params: {
+            page,
+            perPage: page === 1 ? INITIAL : LOAD,
+          },
+        }
+      );
 
-        setTravellers((prev) => {
-            const seen = new Set(prev.map((t) => t._id));
-            const unique = [...prev];
+      const { data, hasNextPage } = res.data.data;
 
-            data.forEach((item: Traveller) => {
-                if (!seen.has(item._id)) {
-                    unique.push(item);
-                    seen.add(item._id);
-                }
-            });
+      setTravellers(prev => {
+        const seen = new Set(prev.map(t => t._id));
+        const unique = [...prev];
 
-            return unique;
+        data.forEach((item: Traveller) => {
+          if (!seen.has(item._id)) {
+            unique.push(item);
+            seen.add(item._id);
+          }
         });
-      
-        setHasMore(hasNextPage);
 
-        setPage((prev) => prev + 1);
+        return unique;
+      });
+
+      setHasMore(hasNextPage);
+
+      setPage(prev => prev + 1);
     } catch (error) {
-      console.error("Travellers fetch error:", error);
+      console.error('Travellers fetch error:', error);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -66,7 +68,7 @@ export default function OurTravellers() {
   }, []);
 
   return (
-    <section className={cn(styles.section, "container")}>
+    <section className={cn(styles.section, 'container')}>
       <h2 className={styles.title}>Наші Мандрівники</h2>
 
       {/* <TravellersList travellers={travellers} /> */}

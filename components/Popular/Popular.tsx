@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import TravellersStoriesItem from "../TravellersStoriesItem/TravellersStoriesItem";
-import styles from "./Popular.module.css";
+import { useState, useEffect, useCallback } from 'react';
+import TravellersStoriesItem from '../TravellersStoriesItem/TravellersStoriesItem';
+import styles from './Popular.module.css';
 
 export interface Story {
   _id: string;
@@ -22,55 +22,110 @@ export default function Popular() {
   const [stories, setStories] = useState<Story[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  const API_URL = 'https://travellers-node.onrender.com';
 
   const fetchStories = useCallback(async () => {
+    //   try {
+    //     const res = await fetch(
+    //       `${process.env.NEXT_PUBLIC_API_URL}/api/stories/popular?page=${page}&limit=${LIMIT}`
+    //     );
+
+    //     const data = await res.json();
+    //     const incoming: Story[] = data.stories;
+
+    //     setStories(prev => [...prev, ...incoming]);
+
+    //     if (incoming.length < LIMIT) {
+    //       setHasMore(false);
+    //     }
+    //   } catch (error) {
+    //     console.error('Помилка завантаження:', error);
+    //   }
+    // }, [page]);
+    if (!API_URL) {
+      console.error('API_URL не задано');
+      setLoading(false);
+      return;
+    }
+
     try {
+      setLoading(true);
       const res = await fetch(
-        `http://localhost:5000/api/stories/popular?page=${page}&limit=${LIMIT}`
+        `${API_URL}/api/stories/popular?page=${page}&limit=${LIMIT}`,
+        { credentials: 'include' }
       );
 
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       const data = await res.json();
-      const incoming: Story[] = data.stories;
 
-      setStories((prev) => [...prev, ...incoming]);
+      let incoming: Story[] = [];
 
-      if (incoming.length < LIMIT) {
-        setHasMore(false);
+      if (data && typeof data === 'object') {
+        if (Array.isArray(data)) {
+          incoming = data;
+        } else if (Array.isArray(data.stories)) {
+          incoming = data.stories;
+        } else if (Array.isArray(data.data)) {
+          incoming = data.data;
+        } else if (data.data && Array.isArray(data.data.stories)) {
+          incoming = data.data.stories;
+        }
       }
+
+      // const incoming: Story[] = rawStories;
+      if (page === 1) {
+        setStories(incoming);
+      } else {
+        setStories(prev => [...prev, ...incoming]);
+      }
+
+      setHasMore(incoming.length === LIMIT);
     } catch (error) {
-      console.error("Помилка завантаження:", error);
+      console.error('Помилка завантаження популярних історій:', error);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
     }
-  }, [page]);
+  }, [API_URL, page]);
+
+  // useEffect(() => {
+  //   let isMounted = true;
+
+  //   Promise.resolve().then(() => {
+  //     if (isMounted) fetchStories();
+  //   });
+
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, [fetchStories]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    Promise.resolve().then(() => {
-      if (isMounted) fetchStories();
-    });
-
-    return () => {
-      isMounted = false;
-    };
+    fetchStories();
   }, [fetchStories]);
 
   const handleLoadMore = () => {
-    setPage((prev) => prev + 1);
+    setPage(prev => prev + 1);
   };
 
   return (
     <section className={styles.section}>
       <h2 className={styles.title}>Популярні історії</h2>
 
+      {loading && stories.length === 0 && <p>Завантаження...</p>}
+
       <div className={styles.list}>
-        {stories.map((story) => (
+        {stories.map(story => (
           <TravellersStoriesItem key={story._id} story={story} />
         ))}
       </div>
 
       {hasMore && (
         <button className={styles.button} onClick={handleLoadMore}>
-          Переглянути всі
+          {loading ? 'Завантажуємо...' : 'Переглянути всі'}
         </button>
       )}
     </section>
