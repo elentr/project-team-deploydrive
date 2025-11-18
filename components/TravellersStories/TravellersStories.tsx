@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import TravellersStoriesItem from "../TravellersStoriesItem/TravellersStoriesItem";
 import styles from "./TravellersStories.module.css";
 
@@ -16,6 +15,16 @@ interface ApiStory {
   date: string;
   ownerId: string;
   favoriteCount: number;
+}
+
+interface TravellersStoriesProps {
+  stories?: Story[];
+  showFilters?: boolean;
+  title?: string;
+  isAuthenticated?: boolean;
+  onLoadMore?: () => void;
+  hasMore?: boolean;
+  loading?: boolean;
 }
 
 const SHOW_PER_PAGE = 9;
@@ -38,58 +47,85 @@ function mapStory(api: ApiStory): Story {
   };
 }
 
-export default function TravellersStories() {
+export default function TravellersStories({
+  stories: externalStories,
+  showFilters = true,
+  title = "Історії мандрівників",
+  isAuthenticated = false,
+  onLoadMore,
+  hasMore: externalHasMore,
+  loading: externalLoading,
+}: TravellersStoriesProps) {
   const [allStories, setAllStories] = useState<Story[]>([]);
-  const [visibleStories, setVisibleStories] = useState<Story[]>([]);
   const [page, setPage] = useState(1);
   const [activeCategory, setActiveCategory] = useState("all");
   const [hasMore, setHasMore] = useState(true);
 
   // ----------- FETCH PAGE -------------
   const fetchPage = useCallback(async (pageNumber: number) => {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/stories`,
-      { params: { page: pageNumber, limit: SERVER_PER_PAGE } }
+    const API = process.env.NEXT_PUBLIC_API_URL;
+    if (!API) return;
+
+    const res = await fetch(
+      `${API}/api/stories?page=${pageNumber}&limit=${SERVER_PER_PAGE}`,
+      {
+        credentials: "include",
+      }
     );
 
-    const items = res.data.data.data.map(mapStory);
+    if (!res.ok) {
+      throw new Error("Не вдалося завантажити історії");
+    }
+
+    const data = await res.json();
+    const items = data.data.data.map(mapStory);
 
     // додаємо у глобальний список
     setAllStories(prev => [...prev, ...items]);
-    setHasMore(res.data.data.hasNextPage);
+    setHasMore(data.data.hasNextPage);
   }, []);
 
   // ----------- INITIAL LOAD -----------
   useEffect(() => {
+    // Якщо stories передані ззовні, не робимо запит
+    if (externalStories !== undefined) {
+      return;
+    }
     (async () => {
       await fetchPage(1);
     })();
-  }, [fetchPage]);
+  }, [fetchPage, externalStories]);
 
   // ----------- UPDATE VISIBLE LIST -----------
-  useEffect(() => {
-    (async () => {
-      const filtered =
-        activeCategory === "all"
-          ? allStories
-          : allStories.filter(s => s.category === activeCategory);
+  // Обчислюємо visibleStories через useMemo замість useEffect для уникнення каскадних рендерів
+  const visibleStories = useMemo(() => {
+    // Якщо stories передані ззовні, використовуємо їх напряму
+    if (externalStories !== undefined) {
+      return externalStories;
+    }
 
-      const slice = filtered.slice(0, page * SHOW_PER_PAGE);
+    const filtered =
+      activeCategory === "all"
+        ? allStories
+        : allStories.filter(s => s.category === activeCategory);
 
-      await Promise.resolve();
-      setVisibleStories(slice);
-    })();
-  }, [allStories, page, activeCategory]);
+    return filtered.slice(0, page * SHOW_PER_PAGE);
+  }, [allStories, page, activeCategory, externalStories]);
 
   // ----------- FILTER BUTTON -----------
   const handleFilter = (cat: string) => {
     setActiveCategory(cat);
     setPage(1);
-    setVisibleStories([]); // очищаємо перед новим застосуванням
   };
 
   // ----------- LOAD MORE -----------
   const loadMore = async () => {
+    // Якщо є зовнішній обробник, використовуємо його
+    if (onLoadMore) {
+      onLoadMore();
+      return;
+    }
+
     const next = page + 1;
     setPage(next);
 
@@ -99,32 +135,43 @@ export default function TravellersStories() {
     }
   };
 
+  // Визначаємо, які stories показувати
+  const displayStories = externalStories !== undefined ? externalStories : visibleStories;
+  const displayHasMore = externalHasMore !== undefined ? externalHasMore : hasMore;
+  const displayLoading = externalLoading !== undefined ? externalLoading : false;
+
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
-        <h2 className={styles.title}>Історії мандрівників</h2>
+        <h2 className={styles.title}>{title}</h2>
 
-        <div className={styles.filters}>
-          {["all", "Європа", "Азія", "Пустелі", "Африка", "Америка", "Гори"].map(id => (
-            <button
-              key={id}
-              className={`${styles.filterBtn} ${
-                activeCategory === id ? styles.filterBtnActive : ""
-              }`}
-              onClick={() => handleFilter(id)}
-            >
-              {id === "all" ? "Всі історії" : id}
-            </button>
-          ))}
-        </div>
+        {showFilters && (
+          <div className={styles.filters}>
+            {["all", "Європа", "Азія", "Пустелі", "Африка", "Америка", "Гори"].map(id => (
+              <button
+                key={id}
+                className={`${styles.filterBtn} ${
+                  activeCategory === id ? styles.filterBtnActive : ""
+                }`}
+                onClick={() => handleFilter(id)}
+              >
+                {id === "all" ? "Всі історії" : id}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className={styles.grid}>
-          {visibleStories.map(s => (
-            <TravellersStoriesItem key={s._id} story={s} />
+          {displayStories.map(s => (
+            <TravellersStoriesItem 
+              key={s._id} 
+              story={s} 
+              isAuthenticated={isAuthenticated}
+            />
           ))}
         </div>
 
-        {hasMore && (
+        {displayHasMore && !displayLoading && (
           <button className={styles.buttonLoad} onClick={loadMore}>
             Показати ще
           </button>

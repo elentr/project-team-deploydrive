@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import cn from "classnames";
 import Loader from "../Loader/Loader";
-import TravellersStoriesItem from "../TravellersStoriesItem/TravellersStoriesItem";
+import TravellersStories from "../TravellersStories/TravellersStories";
 import styles from "./Popular.module.css";
 import type { Story, ApiStory } from "@/types/story";
 import { mapStory } from "@/types/story";
@@ -38,9 +37,6 @@ export default function Popular() {
 
       const data = await res.json();
       
-      // Логування для дебагу (можна прибрати після перевірки)
-      console.log("API Response:", data);
-      
       // Перевіряємо різні можливі структури відповіді
       let rawStories: ApiStory[] = [];
       
@@ -54,12 +50,8 @@ export default function Popular() {
         rawStories = data;
       }
 
-      console.log("Raw stories:", rawStories);
-
       // Мапимо дані з API до формату Story
       const incoming: Story[] = rawStories.map(mapStory);
-      
-      console.log("Mapped stories:", incoming);
 
       // Якщо це перша сторінка, замінюємо дані, інакше додаємо
       if (page === 1) {
@@ -113,20 +105,20 @@ export default function Popular() {
     if (loading) return;
     setPage((prev) => prev + 1);
   };
+
   const isInitialLoading = loading && stories.length === 0;
 
   if (!API) {
     return (
-      <section className={cn(styles.section, "container")}>
-        <div className={styles.header}>
-          <div>
-            <h2 className={styles.title}>Популярні історії</h2>
-            <p className={styles.subtitle}>
-              Надихніться подорожами інших та поділіться своєю історією.
-            </p>
-          </div>
-        </div>
-
+      <section className={styles.section}>
+        <TravellersStories
+          stories={[]}
+          showFilters={false}
+          title="Популярні історії"
+          isAuthenticated={isAuthenticated}
+          hasMore={false}
+          loading={false}
+        />
         <p className={styles.emptyState}>
           Додайте NEXT_PUBLIC_API_URL до файлу .env.local, щоб відобразити
           історії.
@@ -135,49 +127,27 @@ export default function Popular() {
     );
   }
 
-  return (
-    <section className={cn(styles.section, "container")}>
-      <div className={styles.header}>
-        <div>
-          <h2 className={styles.title}>Популярні історії</h2>
-          <p className={styles.subtitle}>
-            Надихніться подорожами інших та поділіться своєю історією.
-          </p>
-        </div>
-      </div>
-
-      {isInitialLoading && (
+  if (isInitialLoading) {
+    return (
+      <section className={styles.section}>
         <div className={styles.loaderWrapper}>
           <Loader size={80} label="Завантажуємо історії..." />
         </div>
-      )}
+      </section>
+    );
+  }
 
-      {!isInitialLoading && (
-        <>
-          <div className={styles.list}>
-            {stories.map((story) => (
-              <TravellersStoriesItem
-                key={story._id}
-                story={story}
-                isAuthenticated={isAuthenticated}
-              />
-            ))}
-          </div>
-
-          {stories.length === 0 && (
-            <p className={styles.emptyState}>
-              Наразі немає популярних історій. Спробуйте пізніше.
-            </p>
-          )}
-        </>
-      )}
-
-      {hasMore && !loading && stories.length > 0 && (
-        <button className={styles.button} onClick={handleLoadMore}>
-          Переглянути всі
-        </button>
-      )}
-
+  return (
+    <section className={styles.section}>
+      <TravellersStories
+        stories={stories}
+        showFilters={false}
+        title="Популярні історії"
+        isAuthenticated={isAuthenticated}
+        onLoadMore={handleLoadMore}
+        hasMore={hasMore}
+        loading={loading}
+      />
       {loading && stories.length > 0 && (
         <div className={styles.loaderBottom}>
           <Loader size={40} label="Завантажуємо ще..." />
