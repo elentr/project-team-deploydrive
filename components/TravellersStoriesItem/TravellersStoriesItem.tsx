@@ -40,8 +40,8 @@ export default function TravellersStoriesItem({
   })();
 
   const bookmarkButtonClass = [
-    styles.bookmarkButton,
-    isSaved ? styles.bookmarkButtonActive : "",
+    styles.story__save,
+    isSaved ? styles.saved : "",
   ]
     .join(" ")
     .trim();
@@ -108,51 +108,51 @@ export default function TravellersStoriesItem({
   };
 
   return (
-    <article className={styles.card}>
-      <div className={styles.imageWrapper}>
-        <Image
-          src={story.img}
-          alt={story.title}
-          fill
-          sizes="(min-width: 768px) 400px, 100vw"
-          className={styles.image}
-        />
-        <span className={styles.categoryBadge}>{story.category}</span>
-      </div>
+    <article className={styles.story}>
+      <Image
+        src={story.img}
+        alt={story.title}
+        width={832}
+        height={400}
+        sizes="(min-width: 1440px) 33vw, (min-width: 768px) 50vw, 100vw"
+        className={styles.story__img}
+        priority={false}
+      />
 
-      <div className={styles.content}>
+      <div className={styles.story__content}>
+        <p className={styles.story__category}>{story.category}</p>
+
+        <h3 className={styles.story__title}>{story.title}</h3>
+
         <div className={styles.meta}>
-          <span className={styles.metaItem}>{formattedDate}</span>
-          <span className={styles.dot} />
-          <span className={styles.metaItem}>{story.readTime} хв</span>
+          <span className={styles.story__meta}>{formattedDate}</span>
+          <span className={styles.favoriteCount}>{story.readTime} хв читати</span>
         </div>
 
-        <h3 className={styles.title}>{story.title}</h3>
+        <p className={styles.story__text}>{story.description}</p>
 
-        <p className={styles.description}>{story.description}</p>
-      </div>
+        <div className={styles.story__author}>
+          <Image
+            src={story.avatar || "/images/avatar.svg"}
+            alt={story.author}
+            width={48}
+            height={48}
+            className={styles.story__avatar}
+          />
 
-      <div className={styles.authorBox}>
-        <Image
-          src={story.avatar || "/images/avatar.svg"}
-          alt={story.author}
-          width={40}
-          height={40}
-          sizes="40px"
-          className={styles.avatar}
-        />
-        <div>
-          <p className={styles.authorName}>{story.author}</p>
-          <p className={styles.authorRole}>Автор статті</p>
+          <div>
+            <p className={styles.story__name}>{story.author}</p>
+            <span className={styles.story__meta}>
+              {bookmarksCount} збережень
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div className={styles.footer}>
-        <Link href={`/stories/${story._id}`} className={styles.primaryButton}>
-          Переглянути статтю
-        </Link>
+        <div className={styles.story__actions}>
+          <Link href={`/stories/${story._id}`} className={styles.story__btn}>
+            Переглянути статтю
+          </Link>
 
-        <div className={styles.bookmarkWrapper}>
           <button
             type="button"
             className={bookmarkButtonClass}
@@ -167,11 +167,10 @@ export default function TravellersStoriesItem({
                 name={isSaved ? "icon-bookmark-filled" : "icon-bookmark"}
                 width={24}
                 height={24}
-                className={styles.bookmarkIcon}
+                className={styles.icon__bookmark}
               />
             )}
           </button>
-          <span className={styles.bookmarkCount}>{bookmarksCount}</span>
         </div>
       </div>
     </article>

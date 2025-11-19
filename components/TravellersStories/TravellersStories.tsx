@@ -154,7 +154,7 @@ export default function TravellersStories({
           </div>
         )}
 
-        <div className={styles.grid}>
+        <div className={styles.stories__list}>
           {displayStories.map(s => (
             <TravellersStoriesItem 
               key={s._id} 
