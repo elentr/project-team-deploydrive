@@ -1,5 +1,3 @@
-import { Traveller } from './traveller';
-
 export type Category = {
   id: string;
   name: string;
@@ -14,21 +12,24 @@ export type ApiStory = {
   img: string;
   title: string;
   article: string;
-  categoryName: string;
-  date: string;
+  category: string;
   ownerId: string;
+  date: string;
   favoriteCount: number;
 };
 
 export interface Story {
   _id: string;
-  category: string;
+  img: string;
   title: string;
+  article: string;
+  category: string;
+  ownerId: string;
+  date: string;
+  favoriteCount?: number;
   description: string;
   author: string;
-  date: string;
   readTime: number;
-  img: string;
   avatar?: string;
 }
 
@@ -46,11 +47,16 @@ export const mapStory = (s: ApiStory): Story => ({
   _id: s._id,
   title: s.title,
   img: s.img,
+  article: s.article,
+  category: s.category,
+  date: s.date,
+  ownerId: s.ownerId,
+  favoriteCount: s.favoriteCount,
+
   description:
     s.article.length > 200 ? s.article.slice(0, 200) + '...' : s.article,
-  category: s.categoryName,
-  author: 'Автор', // заглушка, якщо бекенд не віддає ім'я автора
-  date: s.date,
+
+  author: 'Автор',
   readTime: 1,
   avatar: '/images/avatar.png',
 });

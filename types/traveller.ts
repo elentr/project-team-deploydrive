@@ -1,4 +1,4 @@
-import { Story } from "./story";
+import { Story } from './story';
 
 export interface Traveller {
   _id: string;
