@@ -38,6 +38,11 @@
   font-weight: 700;
   line-height: 1.5;
   color: #000;
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .job {
