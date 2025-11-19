@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import TravellersList from '../TravellersList/TravellersList';
+import OurTravellersList from '../OurTravellers/OurTravellersList';
 import styles from './OurTravellers.module.css';
 import cn from 'classnames';
 import type { Traveller } from '@/types/traveller';
 import Loader from '../Loader/Loader';
 
-const INITIAL = 4; // первые 4 мандрівники
-const LOAD = 3; // подгружаем по 3
+const INITIAL = 4;
+const LOAD = 3;
 
 export default function OurTravellers() {
   const [travellers, setTravellers] = useState<Traveller[]>([]);
@@ -17,43 +17,49 @@ export default function OurTravellers() {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const API_URL = 'https://travellers-node.onrender.com';
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL || 'https://travellers-node.onrender.com';
 
   const fetchTravellers = async () => {
-    if (!hasMore || loading) return;
+    if (loading || !hasMore) return;
+
+    setLoading(true);
 
     try {
-      setLoading(true);
-
-      const res = await axios.get(
-        // `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
-        `${API_URL}/api/users`,
-        {
-          params: {
-            page,
-            perPage: page === 1 ? INITIAL : LOAD,
-          },
-        }
-      );
-
-      const { data, hasNextPage } = res.data.data;
-
-      setTravellers(prev => {
-        const seen = new Set(prev.map(t => t._id));
-        const unique = [...prev];
-
-        data.forEach((item: Traveller) => {
-          if (!seen.has(item._id)) {
-            unique.push(item);
-            seen.add(item._id);
-          }
-        });
-
-        return unique;
+      const res = await axios.get(`${API_URL}/api/users`, {
+        params: {
+          page,
+          perPage: page === 1 ? INITIAL : LOAD,
+          sortBy: 'createdAt',
+          sortOrder: 'desc',
+        },
       });
 
-      setHasMore(hasNextPage);
+      console.log('===== FETCH START =====');
+      console.log('Page:', page);
+      console.log('PerPage:', page === 1 ? INITIAL : LOAD);
+      console.log('Raw response:', res.data);
+      console.log('Returned data length:', res.data.data.data.length);
+      console.log('Returned items:', res.data.data.data);
+      console.log('Has next page:', res.data.data.hasNextPage);
+      console.log('===== FETCH END =====');
 
+      let data = res.data.data.data;
+      const hasNextPage = res.data.data.hasNextPage;
+
+      if (page > 1) {
+        const lastPrev = travellers[travellers.length - 1]?._id;
+        const firstOfNew = data[0]?._id;
+
+        if (firstOfNew === lastPrev) {
+          console.warn('Duplicate detected → removing only first item');
+          data = data.slice(1);
+        }
+      }
+
+      setTravellers(prev => [...prev, ...data]);
+
+      setHasMore(hasNextPage);
       setPage(prev => prev + 1);
     } catch (error) {
       console.error('Travellers fetch error:', error);
@@ -71,8 +77,9 @@ export default function OurTravellers() {
     <section className={cn(styles.section, 'container')}>
       <h2 className={styles.title}>Наші Мандрівники</h2>
 
-      {/* <TravellersList travellers={travellers} /> */}
+      <OurTravellersList travellers={travellers} />
 
+      {/* Кнопка загрузки */}
       {hasMore && !loading && (
         <button
           className={styles.button}
@@ -82,8 +89,8 @@ export default function OurTravellers() {
           Переглянути всіх
         </button>
       )}
+
       {loading && <Loader />}
-      {loading && <p className={styles.loading}>Завантаження...</p>}
     </section>
   );
 }
