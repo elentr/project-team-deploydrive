@@ -12,7 +12,8 @@ export type ApiStory = {
   img: string;
   title: string;
   article: string;
-  categoryName: string;
+  category?: string;
+  categoryName?: string;
   date: string;
   ownerId: string | { _id: string; name: string; avatarUrl?: string };
   favoriteCount: number;
@@ -32,23 +33,33 @@ export interface Story {
   isSaved?: boolean;
 }
 
-export const mapStory = (s: ApiStory): Story => {
-  // Якщо ownerId - об'єкт з даними користувача
+export const mapStory = (s: ApiStory, baseUrl?: string, categoryName?: string): Story => {
   const owner = typeof s.ownerId === 'object' ? s.ownerId : null;
   const author = owner?.name || "Автор";
-  const avatar = owner?.avatarUrl || "/images/avatar.svg";
+  
+  let avatar = owner?.avatarUrl || "/images/avatar.svg";
+  if (avatar && !avatar.startsWith('http') && !avatar.startsWith('/') && baseUrl) {
+    avatar = `${baseUrl}/${avatar}`;
+  }
+
+  let img = s.img || '';
+  if (img && !img.startsWith('http') && baseUrl) {
+    img = img.startsWith('/') 
+      ? `${baseUrl}${img}` 
+      : `${baseUrl}/${img}`;
+  }
 
   return {
     _id: s._id,
     title: s.title,
-    img: s.img, // URL зображення з бекенду
+    img,
     description:
       s.article.length > 200 ? s.article.slice(0, 200) + "..." : s.article,
-    category: s.categoryName,
+    category: categoryName || s.categoryName || s.category || 'Без категорії',
     author,
     date: s.date,
     readTime: 1,
-    avatar, // URL аватара з бекенду або заглушка
+    avatar,
     bookmarksCount: s.favoriteCount,
     isSaved: false,
   };

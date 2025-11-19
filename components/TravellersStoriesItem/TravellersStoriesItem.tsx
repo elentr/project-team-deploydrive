@@ -141,6 +141,13 @@ export default function TravellersStoriesItem({
           width={400}
           height={200}
           className={css.story__img}
+          unoptimized={story.img?.startsWith('http')}
+          onError={(e) => {
+            const fallbackSrc = '/images/avatar.svg';
+            if (e.currentTarget.src !== fallbackSrc && !e.currentTarget.src.endsWith(fallbackSrc)) {
+              e.currentTarget.src = fallbackSrc;
+            }
+          }}
         />
 
         <div className={css.story__content}>
@@ -155,6 +162,13 @@ export default function TravellersStoriesItem({
               width={48}
               height={48}
               className={css.story__avatar}
+              unoptimized={story.avatar?.startsWith('http')}
+              onError={(e) => {
+                const fallbackSrc = '/images/avatar.svg';
+                if (e.currentTarget.src !== fallbackSrc && !e.currentTarget.src.endsWith(fallbackSrc)) {
+                  e.currentTarget.src = fallbackSrc;
+                }
+              }}
             />
             <div className={css.story__info}>
               <p className={css.story__name}>{story.author}</p>

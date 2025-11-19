@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import TravellersStories from '../TravellersStories/TravellersStories';
 import css from './PopularClient.module.css';
-import { Story, ApiStory, mapStory } from '@/types/story';
+import { Story, ApiStory, mapStory, Category } from '@/types/story';
 import Loader from '@/components/Loader/Loader';
 
 interface PopularClientProps {
@@ -22,6 +22,46 @@ export default function PopularClient({
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [categoryMap, setCategoryMap] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const API = process.env.NEXT_PUBLIC_API_URL;
+        if (!API) return;
+
+        const baseUrl = API.endsWith('/') ? API.slice(0, -1) : API;
+        const apiPath = baseUrl.endsWith('/api') ? '/categories' : '/api/categories';
+        const url = `${baseUrl}${apiPath}`;
+
+        const res = await fetch(url, { credentials: 'include' });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        let categories: Category[] = [];
+        
+        if (Array.isArray(data)) {
+          categories = data;
+        } else if (data.data && Array.isArray(data.data)) {
+          categories = data.data;
+        } else if (data.categories && Array.isArray(data.categories)) {
+          categories = data.categories;
+        }
+        
+        const map = new Map<string, string>();
+        categories.forEach((cat: Category) => {
+          if (cat.id && cat.name) {
+            map.set(cat.id, cat.name);
+          }
+        });
+        setCategoryMap(map);
+      } catch (error) {
+        console.error('Помилка отримання категорій:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -41,6 +81,23 @@ export default function PopularClient({
     setStories(initialStories.slice(0, count));
   }, [initialStories, isMobile]);
 
+  useEffect(() => {
+    if (categoryMap.size === 0 || isMobile === null) return;
+
+    setStories(prevStories => {
+      return prevStories.map(story => {
+        const categoryValue = story.category;
+        if (categoryValue && categoryMap.has(categoryValue)) {
+          const categoryName = categoryMap.get(categoryValue);
+          if (categoryName && categoryName !== categoryValue) {
+            return { ...story, category: categoryName };
+          }
+        }
+        return story;
+      });
+    });
+  }, [categoryMap, isMobile]);
+
   if (isMobile === null) return null;
 
   const perPage = window.innerWidth >= 768 && window.innerWidth < 1440 ? 4 : 3;
@@ -57,11 +114,7 @@ export default function PopularClient({
         return;
       }
       
-      // Видаляємо слеш в кінці, якщо є
       const baseUrl = API.endsWith('/') ? API.slice(0, -1) : API;
-      
-      // NEXT_PUBLIC_API_URL має бути без /api, тому завжди додаємо /api/stories/popular
-      // Якщо хтось додав /api в кінці (для сумісності), обробляємо це
       const apiPath = baseUrl.endsWith('/api') ? '/stories/popular' : '/api/stories/popular';
       const url = `${baseUrl}${apiPath}?page=${nextPage}&limit=${perPage}`;
       
@@ -75,7 +128,9 @@ export default function PopularClient({
       const data = await res.json();
       let rawStories: ApiStory[] = [];
       
-      if (data.stories && Array.isArray(data.stories)) {
+      if (data.data && data.data.stories && Array.isArray(data.data.stories)) {
+        rawStories = data.data.stories as ApiStory[];
+      } else if (data.stories && Array.isArray(data.stories)) {
         rawStories = data.stories as ApiStory[];
       } else if (data.data && data.data.data && Array.isArray(data.data.data)) {
         rawStories = data.data.data as ApiStory[];
@@ -88,7 +143,10 @@ export default function PopularClient({
       if (rawStories.length === 0) {
         setHasMore(false);
       } else {
-        const mappedStories = rawStories.map(mapStory);
+        const mappedStories = rawStories.map(s => {
+          const categoryName = s.category ? categoryMap.get(s.category) : undefined;
+          return mapStory(s, baseUrl, categoryName);
+        });
         setStories(prev => [...prev, ...mappedStories]);
         setPage(nextPage);
       }

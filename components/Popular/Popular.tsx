@@ -1,8 +1,46 @@
 import PopularClient from './PopularClient';
-import { Story, ApiStory, mapStory } from '@/types/story';
+import { Story, ApiStory, mapStory, Category } from '@/types/story';
 
 interface PopularProps {
   withPagination?: boolean;
+}
+
+async function fetchCategories(baseUrl: string): Promise<Map<string, string>> {
+  try {
+    const apiPath = baseUrl.endsWith('/api') ? '/categories' : '/api/categories';
+    const url = `${baseUrl}${apiPath}`;
+    
+    const res = await fetch(url, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) return new Map();
+
+    const data = await res.json();
+    let categories: Category[] = [];
+    
+    if (Array.isArray(data)) {
+      categories = data;
+    } else if (data.data && Array.isArray(data.data)) {
+      categories = data.data;
+    } else if (data.categories && Array.isArray(data.categories)) {
+      categories = data.categories;
+    }
+    
+    const categoryMap = new Map<string, string>();
+    categories.forEach((cat: Category) => {
+      if (cat.id && cat.name) {
+        categoryMap.set(cat.id, cat.name);
+      }
+    });
+
+    return categoryMap;
+  } catch (error) {
+    return new Map();
+  }
 }
 
 async function fetchStoriesServer(page: number, limit: number): Promise<Story[]> {
@@ -11,18 +49,13 @@ async function fetchStoriesServer(page: number, limit: number): Promise<Story[]>
     process.env.API_BASE_URL ||
     'https://travellers-node.onrender.com';
   
-  // Видаляємо слеш в кінці, якщо є
   const baseUrl = API.endsWith('/') ? API.slice(0, -1) : API;
-  
-  // NEXT_PUBLIC_API_URL має бути без /api, тому завжди додаємо /api/stories/popular
-  // Якщо хтось додав /api в кінці (для сумісності), обробляємо це
   const apiPath = baseUrl.endsWith('/api') ? '/stories/popular' : '/api/stories/popular';
   const url = `${baseUrl}${apiPath}?page=${page}&limit=${limit}`;
 
   try {
-    // Додаємо timeout для server-side fetch
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     const res = await fetch(url, { 
       cache: 'no-store',
@@ -39,7 +72,9 @@ async function fetchStoriesServer(page: number, limit: number): Promise<Story[]>
     const data = await res.json();
     let rawStories: ApiStory[] = [];
     
-    if (data.stories && Array.isArray(data.stories)) {
+    if (data.data && data.data.stories && Array.isArray(data.data.stories)) {
+      rawStories = data.data.stories as ApiStory[];
+    } else if (data.stories && Array.isArray(data.stories)) {
       rawStories = data.stories as ApiStory[];
     } else if (data.data && data.data.data && Array.isArray(data.data.data)) {
       rawStories = data.data.data as ApiStory[];
@@ -49,17 +84,14 @@ async function fetchStoriesServer(page: number, limit: number): Promise<Story[]>
       rawStories = data as ApiStory[];
     }
 
-    return rawStories.map(mapStory);
+    const categoryMap = await fetchCategories(baseUrl);
+    const mappedStories = rawStories.map(s => {
+      const categoryName = s.category ? categoryMap.get(s.category) : undefined;
+      return mapStory(s, baseUrl, categoryName);
+    });
+
+    return mappedStories;
   } catch (error) {
-    // Не логуємо помилку в production, щоб не засмічувати консоль
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Помилка отримання історій:', error);
-      console.error('URL запиту:', url);
-      if (error instanceof Error) {
-        console.error('Деталі помилки:', error.message);
-      }
-    }
-    // Повертаємо порожній масив, щоб компонент не падав
     return [];
   }
 }
