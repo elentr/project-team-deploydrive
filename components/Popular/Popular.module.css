@@ -1,80 +1,61 @@
-.section {
-  margin-top: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-.header {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.title {
-  font-size: clamp(28px, 4vw, 40px);
+.stories__title {
+  font-family: var(--font-sora) sans-serif;
   font-weight: 700;
-  margin: 0;
-  color: #111322;
+  font-size: 28px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--color-scheme-1-text);
+
+  margin-bottom: 24px;
 }
 
-.subtitle {
-  margin: 0;
-  color: #5f6774;
-  font-size: 16px;
-  line-height: 1.5;
+.stories__footer {
+  display: flex;
+  justify-content: center;
+  display: none;
 }
 
-.list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 32px;
-}
-
-.emptyState {
-  margin: 0;
-  padding: 40px;
-  border-radius: 16px;
-  background: #f7f8fb;
-  text-align: center;
-  color: #5c6473;
-}
-
-.button {
-  margin: 0 auto;
-  padding: 14px 28px;
-  background: #1a73e8;
+.stories__more {
+  background: #4169e1;
+  border: 1px solid #4169e1;
   color: #fff;
-  font-size: 16px;
-  border-radius: 12px;
-  border: none;
-  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 8px;
+  padding: 6px 12px;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(26, 115, 232, 0.25);
+  transition: all 0.3s ease;
+  height: 48px;
+  font-family: var(--font-nunito-sans);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.5;
 }
 
-.button:hover {
-  background: #155bc0;
+.stories__more:hover {
+  background: #e8eeff;
+  color: #0a0a0a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.08);
+  border: 1 solid #4169e1;
+  
 }
 
-.button:active {
-  transform: scale(0.97);
+@media screen and (min-width: 768px) {
+  .stories__title {
+    font-size: 44px;
+  }
+
+  .stories__footer {
+    display: flex;
+  }
 }
 
-.button:focus-visible {
-  outline: 3px solid #8cb8ff;
-  outline-offset: 4px;
-}
+@media screen and (min-width: 1440px) {
+  .stories__title {
+    font-size: 52px;
+    margin-bottom: 40px;
+  }
 
-.loaderWrapper {
-  min-height: 320px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.loaderBottom {
-  display: flex;
-  justify-content: center;
-  padding: 20px 0 8px;
+  .stories__more {
+    font-size: 18px;
+  }
 }

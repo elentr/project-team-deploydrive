@@ -14,7 +14,7 @@ export type ApiStory = {
   article: string;
   categoryName: string;
   date: string;
-  ownerId: string;
+  ownerId: string | { _id: string; name: string; avatarUrl?: string };
   favoriteCount: number;
 };
 
@@ -32,17 +32,24 @@ export interface Story {
   isSaved?: boolean;
 }
 
-export const mapStory = (s: ApiStory): Story => ({
-  _id: s._id,
-  title: s.title,
-  img: s.img,
-  description:
-    s.article.length > 200 ? s.article.slice(0, 200) + "..." : s.article,
-  category: s.categoryName,
-  author: "Автор", // заглушка, якщо немає автора з бекенду
-  date: s.date,
-  readTime: 1,
-  avatar: "/images/avatar.svg",
-  bookmarksCount: s.favoriteCount,
-  isSaved: false,
-});
+export const mapStory = (s: ApiStory): Story => {
+  // Якщо ownerId - об'єкт з даними користувача
+  const owner = typeof s.ownerId === 'object' ? s.ownerId : null;
+  const author = owner?.name || "Автор";
+  const avatar = owner?.avatarUrl || "/images/avatar.svg";
+
+  return {
+    _id: s._id,
+    title: s.title,
+    img: s.img, // URL зображення з бекенду
+    description:
+      s.article.length > 200 ? s.article.slice(0, 200) + "..." : s.article,
+    category: s.categoryName,
+    author,
+    date: s.date,
+    readTime: 1,
+    avatar, // URL аватара з бекенду або заглушка
+    bookmarksCount: s.favoriteCount,
+    isSaved: false,
+  };
+};

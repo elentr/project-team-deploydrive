@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/img/**",
       },
+      {
+        protocol: "https",
+        hostname: "travellers-node.onrender.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };

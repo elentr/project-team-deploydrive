@@ -60,6 +60,7 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -80,6 +81,7 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   overflow: hidden;
   flex-grow: 1;
   margin-top: auto;
@@ -103,6 +105,12 @@
   border-radius: 50%;
   object-fit: cover;
   margin-right: 16px;
+}
+
+.story__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .story__name {
@@ -163,6 +171,27 @@
   fill: #0a0a0a;
   width: 16px;
   height: 16px;
+}
+
+.iconEdit {
+  fill: #0a0a0a;
+  width: 24px;
+  height: 24px;
+}
+
+.icon__bookmark {
+  color: #0a0a0a;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.icon__saved {
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  stroke: none;
 }
 
 .story__actions {

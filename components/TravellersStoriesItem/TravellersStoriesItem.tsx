@@ -1,178 +1,209 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import Icon from "../Icon/Icon";
-import type { Story } from "@/types/story";
-import styles from "./TravellersStoriesItem.module.css";
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
+import { Story } from '@/types/story';
+import css from './TravellersStoriesItem.module.css';
+import Icon from '../Icon/Icon';
+import Link from 'next/link';
+import { Modal } from '../CreateStoryErrorModal/Modal';
 
-interface Props {
+interface TravellersStoriesItemProps {
   story: Story;
-  isAuthenticated?: boolean;
+  isAuthenticated: boolean;
+  isMyStory?: boolean;
+  onRemoveSavedStory?: (id: string) => void; // ⬅ додаємо!
 }
 
 export default function TravellersStoriesItem({
   story,
-  isAuthenticated = false,
-}: Props) {
+  isAuthenticated,
+  onRemoveSavedStory,
+  isMyStory,
+}: TravellersStoriesItemProps) {
   const router = useRouter();
-  const [isSaved, setIsSaved] = useState(Boolean(story.isSaved));
-  const [bookmarksCount, setBookmarksCount] = useState(
+  const queryClient = useQueryClient();
+  const [isSaved, setIsSaved] = useState<boolean>(story.isSaved ?? false);
+  const [favoriteCount, setFavoriteCount] = useState<number>(
     story.bookmarksCount ?? 0
   );
-  const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  const apiBase = process.env.NEXT_PUBLIC_API_URL;
+  useEffect(() => {
+    setIsSaved(story.isSaved ?? false);
+  }, [story.isSaved]);
 
-  const formattedDate = (() => {
-    if (!story.date) return "";
-    const date = new Date(story.date);
-    if (Number.isNaN(date.getTime())) {
-      return story.date;
-    }
-    return new Intl.DateTimeFormat("uk-UA", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }).format(date);
-  })();
-
-  const bookmarkButtonClass = [
-    styles.story__save,
-    isSaved ? styles.saved : "",
-  ]
-    .join(" ")
-    .trim();
-
-  const handleBookmarkClick = async () => {
-    if (isBookmarkLoading) return;
-
+  const handleToggleFavorite = async () => {
     if (!isAuthenticated) {
-      router.push("/auth/register");
+      setIsAuthModalOpen(true);
       return;
     }
 
-    if (!apiBase) {
-      alert("Не налаштовано NEXT_PUBLIC_API_URL.");
-      return;
-    }
+    if (loading) return;
 
-    setIsBookmarkLoading(true);
+    const prevSaved = isSaved;
+    const prevCount = favoriteCount;
+    const nextSaved = !prevSaved;
+
+    // оптимістичне оновлення UI в самій картці
+    setIsSaved(nextSaved);
+    setFavoriteCount(prevCount + (nextSaved ? 1 : -1));
+
+    // видалення картки зі сторінки, якщо "unfavorite"
+    if (!nextSaved && onRemoveSavedStory) {
+      onRemoveSavedStory(story._id);
+    }
+    setLoading(true);
+
+    const prevSavedMe = queryClient.getQueryData<Story[]>(['savedStoriesMe']);
 
     try {
-      const method = isSaved ? "DELETE" : "POST";
+      const API = process.env.NEXT_PUBLIC_API_URL;
+      if (!API) {
+        throw new Error('API URL не налаштовано');
+      }
+
+      const method = nextSaved ? 'POST' : 'DELETE';
       const response = await fetch(
-        `${apiBase}/api/users/saved/${story._id}`,
+        `${API}/api/users/saved/${story._id}`,
         {
           method,
-          credentials: "include",
+          credentials: 'include',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-          body:
-            method === "POST"
-              ? JSON.stringify({ storyId: story._id })
-              : undefined,
+          body: method === 'POST' ? JSON.stringify({ storyId: story._id }) : undefined,
         }
       );
 
       if (!response.ok) {
-        if (response.status === 401) {
-          router.push("/auth/register");
-          return;
-        }
-
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || "Не вдалося оновити список збережених історій."
-        );
+        throw new Error('Не вдалося оновити збережені історії');
       }
 
-      setIsSaved((prev) => !prev);
-      setBookmarksCount((prev) => {
-        const delta = isSaved ? -1 : 1;
-        const nextValue = prev + delta;
-        return nextValue < 0 ? 0 : nextValue;
-      });
+      if (nextSaved) {
+        // пушимо цю історію в кеш savedStoriesMe
+        queryClient.setQueryData<Story[] | undefined>(
+          ['savedStoriesMe'],
+          prev => {
+            if (!prev) return [story];
+            if (prev.some(prevOne => prevOne._id === story._id)) return prev;
+            return [...prev, story];
+          }
+        );
+      } else {
+        // прибираємо історію з кешу savedStoriesMe
+        queryClient.setQueryData<Story[] | undefined>(
+          ['savedStoriesMe'],
+          prev =>
+            prev ? prev.filter(prevOne => prevOne._id !== story._id) : prev
+        );
+        // видалити картку зі сторінки
+        if (onRemoveSavedStory) {
+          onRemoveSavedStory(story._id);
+        }
+      }
+      queryClient.invalidateQueries({ queryKey: ['savedStoriesByUser'] });
+      queryClient.invalidateQueries({ queryKey: ['savedStoriesMe'] });
     } catch (error) {
-      alert(
-        error instanceof Error
-          ? error.message
-          : "Сталася помилка. Спробуйте, будь ласка, ще раз."
-      );
+      console.error(error);
+
+      // відкат UI якщо зламається
+      setIsSaved(prevSaved);
+      setFavoriteCount(prevCount);
+
+      // відкат кешу savedStoriesMe якщо зламається
+      queryClient.setQueryData(['savedStoriesMe'], prevSavedMe);
+
+      toast.error('Не вдалося оновити збережені історії');
     } finally {
-      setIsBookmarkLoading(false);
+      setLoading(false);
     }
   };
 
+  function formatDate(dateString: string) {
+    const d = new Date(dateString);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
+  }
+  const categoryName = story.category ?? 'Без категорії';
   return (
-    <article className={styles.story}>
-      <Image
-        src={story.img}
-        alt={story.title}
-        width={832}
-        height={400}
-        sizes="(min-width: 1440px) 33vw, (min-width: 768px) 50vw, 100vw"
-        className={styles.story__img}
-        priority={false}
-      />
+    <>
+      <li className={css.story}>
+        <Image
+          src={story.img}
+          alt={story.title}
+          width={400}
+          height={200}
+          className={css.story__img}
+        />
 
-      <div className={styles.story__content}>
-        <p className={styles.story__category}>{story.category}</p>
+        <div className={css.story__content}>
+          <p className={css.story__category}>{categoryName}</p>
+          <h3 className={css.story__title}>{story.title}</h3>
+          <p className={css.story__text}>{story.description}</p>
 
-        <h3 className={styles.story__title}>{story.title}</h3>
+          <div className={css.story__author}>
+            <Image
+              src={story.avatar || '/images/avatar.svg'}
+              alt="Автор"
+              width={48}
+              height={48}
+              className={css.story__avatar}
+            />
+            <div className={css.story__info}>
+              <p className={css.story__name}>{story.author}</p>
+              <div className={css.meta}>
+                <span className={css.story__meta}>
+                  {formatDate(story.date)}
+                </span>
+                <span className={css.favoriteCount}>{favoriteCount}</span>
+                <Icon name="icon-bookmark" className={css.icon} />
+              </div>
+            </div>
+          </div>
+          <div className={css.story__actions}>
+            <Link href={`/stories/${story._id}`} className={css.story__btn}>
+              Переглянути статтю
+            </Link>
 
-        <div className={styles.meta}>
-          <span className={styles.story__meta}>{formattedDate}</span>
-          <span className={styles.favoriteCount}>{story.readTime} хв читати</span>
-        </div>
-
-        <p className={styles.story__text}>{story.description}</p>
-
-        <div className={styles.story__author}>
-          <Image
-            src={story.avatar || "/images/avatar.svg"}
-            alt={story.author}
-            width={48}
-            height={48}
-            className={styles.story__avatar}
-          />
-
-          <div>
-            <p className={styles.story__name}>{story.author}</p>
-            <span className={styles.story__meta}>
-              {bookmarksCount} збережень
-            </span>
+            {/* Якщо моя історія → EDIT */}
+            {isMyStory ? (
+              <button
+                onClick={() => router.push(`/stories/${story._id}/edit`)}
+                className={css.story__save}
+              >
+                <Icon name="icon-edit" className={css.iconEdit} />
+              </button>
+            ) : (
+              <button
+                onClick={handleToggleFavorite}
+                disabled={loading}
+                className={`${css.story__save} ${isSaved ? css.saved : ''}`}
+              >
+                <Icon
+                  name="icon-bookmark"
+                  className={`${isSaved ? css.icon__saved : css.icon__bookmark}`}
+                />
+              </button>
+            )}
           </div>
         </div>
-
-        <div className={styles.story__actions}>
-          <Link href={`/stories/${story._id}`} className={styles.story__btn}>
-            Переглянути статтю
-          </Link>
-
-          <button
-            type="button"
-            className={bookmarkButtonClass}
-            onClick={handleBookmarkClick}
-            disabled={isBookmarkLoading}
-            aria-pressed={isSaved}
-          >
-            {isBookmarkLoading ? (
-              <span className={styles.bookmarkLoader} aria-hidden="true" />
-            ) : (
-              <Icon
-                name={isSaved ? "icon-bookmark-filled" : "icon-bookmark"}
-                width={24}
-                height={24}
-                className={styles.icon__bookmark}
-              />
-            )}
-          </button>
-        </div>
-      </div>
-    </article>
+      </li>
+      <Modal
+        open={isAuthModalOpen}
+        title="Помилка під час збереження"
+        description="Щоб зберегти статтю вам треба увійти, якщо ще немає облікового запису — зареєструйтесь."
+        onClose={() => {
+          setIsAuthModalOpen(false);
+          router.push('/auth/register');
+        }}
+      />
+    </>
   );
 }
