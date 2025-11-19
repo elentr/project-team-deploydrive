@@ -13,4 +13,5 @@ export interface TravellerClientProps {
   initialTraveller: Traveller;
   initialStories: Story[];
   initialHasNextPage: boolean;
+  categoriesMap?: Map<string, string>;
 }

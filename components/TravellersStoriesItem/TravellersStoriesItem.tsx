@@ -3,14 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import styles from './TravellersStoriesItem.module.css';
 import { Story } from '@/types/story';
 import { Traveller } from '@/types/traveller';
-import { useState } from 'react';
 import { useAuthStore } from '@/lib/store/authStore';
-import { useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-
 import {
   favouriteAdd,
   favouriteRemove,
@@ -21,22 +20,54 @@ import Loader from '../Loader/Loader';
 
 interface Props {
   story: Story;
-  travellersMap: Map<string, Traveller>;
+  travellersMap?: Map<string, Traveller>;
 }
 
+const categories = [
+  { _id: '68fb50c80ae91338641121f0', name: 'Азія' },
+  { _id: '68fb50c80ae91338641121f1', name: 'Гори' },
+  { _id: '68fb50c80ae91338641121f2', name: 'Європа' },
+  { _id: '68fb50c80ae91338641121f3', name: 'Америка' },
+  { _id: '68fb50c80ae91338641121f4', name: 'Африка' },
+  { _id: '68fb50c80ae91338641121f6', name: 'Пустелі' },
+  { _id: '68fb50c80ae91338641121f7', name: 'Балкани' },
+  { _id: '68fb50c80ae91338641121f8', name: 'Кавказ' },
+  { _id: '68fb50c80ae91338641121f9', name: 'Океанія' },
+];
+
+const fetchUserById = async (id: string): Promise<Traveller> => {
+  const { data } = await axios.get(
+    `${process.env.NEXT_PUBLIC_DATA_URL}/api/users/${id}`
+  );
+  return data.data.user;
+};
+
 export default function TravellersStoriesItem({ story, travellersMap }: Props) {
-  const author = travellersMap.get(story.ownerId);
-  const { user, isAuthenticated, setUser } = useAuthStore();
   const router = useRouter();
+  const { user, isAuthenticated, setUser } = useAuthStore();
+
+  const authorFromMap = travellersMap?.get(story.ownerId);
+
+  const { data: authorFromApi } = useQuery({
+    queryKey: ['user', story.ownerId],
+    queryFn: () => fetchUserById(story.ownerId),
+    enabled: !authorFromMap && !!story.ownerId,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const author = authorFromMap || authorFromApi;
 
   const isOwner = user?._id === story.ownerId;
-
   const isSaved = user?.savedStories?.includes(story._id) ?? false;
-  const [likes, setLikes] = useState(story.favoriteCount ?? 0);
 
+  const [likes, setLikes] = useState(story.favoriteCount ?? 0);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
+
+  const categoryName =
+    categories.find(c => c._id === story.category)?.name || 'Категорія';
 
   const addFavMutation = useMutation({
     mutationFn: async () =>
@@ -47,13 +78,10 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
     onSuccess: ([_, updated]) => {
       if (!user) return;
       const currentSaved = user.savedStories || [];
-
       setUser({ ...user, savedStories: [...currentSaved, story._id] });
       setLikes(updated?.data?.favoriteCount ?? likes + 1);
     },
-    onError: (error: AxiosError<{ error: string }>) => {
-      console.error('Error adding favorite:', error.response?.data?.error);
-    },
+    onError: error => console.error(error),
   });
 
   const removeFavMutation = useMutation({
@@ -65,21 +93,17 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
     onSuccess: ([_, updated]) => {
       if (!user) return;
       const currentSaved = user.savedStories || [];
-
       setUser({
         ...user,
         savedStories: currentSaved.filter(id => id !== story._id),
       });
       setLikes(updated?.data?.favoriteCount ?? likes - 1);
     },
-    onError: (error: AxiosError<{ error: string }>) => {
-      console.error('Error removing favorite:', error.response?.data?.error);
-    },
+    onError: error => console.error(error),
   });
 
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
-
     if (isOwner) {
       router.push(`/stories/edit/${story._id}`);
       return;
@@ -105,26 +129,38 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
   const formatDate = (d: string) => {
     if (!d) return '';
     try {
-      const [y, m, day] = d.split('T')[0].split('-');
-      return `${day}.${m}.${y}`;
+      const date = new Date(d);
+      if (isNaN(date.getTime())) return d;
+      return new Intl.DateTimeFormat('uk-UA', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }).format(date);
     } catch {
       return d;
     }
   };
+
+  const authorName = author?.name || story.author || 'Невідомий автор';
+  const authorAvatar =
+    author?.avatarUrl || story.avatar || '/images/avatar.png';
+
+  const isLoading = addFavMutation.isPending || removeFavMutation.isPending;
 
   return (
     <article className={styles.card}>
       <div className={styles.imageWrapper}>
         <Image
           src={story.img || '/images/placeholder.jpg'}
-          alt={story.title}
+          alt={story.title || 'Історія'}
           fill
           className={styles.image}
+          sizes="(max-width: 768px) 100vw, 50vw"
         />
       </div>
 
       <div className={styles.info}>
-        <span className={styles.category}>{story.category}</span>
+        <span className={styles.category}>{categoryName}</span>
 
         <h3 className={styles.title}>{story.title}</h3>
 
@@ -134,28 +170,26 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
             : story.article}
         </p>
 
-        {author && (
-          <div className={styles.authorBox}>
-            <Image
-              src={author.avatarUrl || '/images/avatar.png'}
-              alt={author.name}
-              width={48}
-              height={48}
-              className={styles.avatar}
-            />
-            <div>
-              <span className={styles.name}>{author.name}</span>
-              <div className={styles.autorWrapp}>
-                <span className={styles.date}>{formatDate(story.date)}</span>
-                <span className={styles.dot}>&#183;</span>
-                <span className={styles.save}>{likes}</span>
-                <svg width="24" height="24" className={styles.bookmarkLittle}>
-                  <use href="/icons.svg#icon-bookmark" />
-                </svg>
-              </div>
+        <div className={styles.authorBox}>
+          <Image
+            src={authorAvatar}
+            alt={authorName}
+            width={48}
+            height={48}
+            className={styles.avatar}
+          />
+          <div>
+            <span className={styles.name}>{authorName}</span>
+            <div className={styles.autorWrapp}>
+              <span className={styles.date}>{formatDate(story.date)}</span>
+              <span className={styles.dot}>&#183;</span>
+              <span className={styles.save}>{likes}</span>
+              <svg width="24" height="24" className={styles.bookmarkLittle}>
+                <use href="/icons.svg#icon-bookmark" />
+              </svg>
             </div>
           </div>
-        )}
+        </div>
 
         <div className={styles.footer}>
           <Link href={`/stories/${story._id}`} className={styles.button}>
@@ -168,7 +202,8 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
               isSaved && !isOwner ? styles.favorButtonPush : ''
             }`}
             type="button"
-            disabled={addFavMutation.isPending || removeFavMutation.isPending}
+            disabled={!isOwner && isLoading}
+            title={isOwner ? 'Редагувати' : isSaved ? 'Видалити' : 'Зберегти'}
           >
             <svg width="24" height="24" className={styles.bookmark}>
               <use
@@ -177,7 +212,7 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
                 }
               />
             </svg>
-            {(addFavMutation.isPending || removeFavMutation.isPending) && (
+            {!isOwner && isLoading && (
               <div className={styles.loaderWrapper}>
                 <Loader />
               </div>

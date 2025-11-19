@@ -58,7 +58,7 @@ export default function TravellerPageClient({
             initialStories={initialStories}
             initialHasMore={initialHasNextPage}
             travellers={travellers}
-            fetchNextPage={loadTravellerStories} 
+            fetchNextPage={loadTravellerStories}
           />
         ) : (
           <MessageNoStories
