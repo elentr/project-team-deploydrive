@@ -1,8 +1,12 @@
-@import url("./stylesVar.css");
+@import url('./stylesVar.css');
 
 :root {
   --background: var(--color-scheme-2-background);
   --foreground: #171717;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 @media (prefers-color-scheme: dark) {

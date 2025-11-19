@@ -1,0 +1,29 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .item {
+    width: calc(50% - 24px);
+  }
+}
+
+/* DESKTOP */
+@media (min-width: 1440px) {
+  .list {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .item {
+    width: calc(25% - 24px);
+  }
+}
