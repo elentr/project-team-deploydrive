@@ -6,26 +6,45 @@ import styles from './Popular.module.css';
 import { Story } from '@/types/story';
 import { Traveller } from '@/types/traveller';
 
-const LIMIT = 3;
-const API_URL = 'https://travellers-node.onrender.com';
-
 export default function Popular() {
   const [stories, setStories] = useState<Story[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  const [limit, setLimit] = useState(3);
+
   const [travellers, setTravellers] = useState<Traveller[]>([]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 768) {
+        setLimit(3); // Мобільна
+      } else if (width >= 768 && width < 1280) {
+        setLimit(4); // Планшет
+      } else {
+        setLimit(3); // Десктоп
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const fetchStories = useCallback(async () => {
-    if (!API_URL) return;
+    if (!process.env.NEXT_PUBLIC_API_URL) return;
 
     try {
       setLoading(true);
+
       const res = await fetch(
-        `${API_URL}/api/stories/popular?page=${page}&limit=${LIMIT}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/stories/popular?page=${page}&perPage=${limit}`,
         { credentials: 'include' }
       );
+
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const data = await res.json();
@@ -49,7 +68,7 @@ export default function Popular() {
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, limit]);
 
   useEffect(() => {
     fetchStories();
@@ -80,17 +99,18 @@ export default function Popular() {
             />
           </li>
         ))}
-        {hasMore && (
-          <button
-            type="button"
-            className={styles.buttonLoad}
-            onClick={handleLoadMore}
-            disabled={loading}
-          >
-            {loading ? 'Завантаження...' : 'Переглянути ще'}
-          </button>
-        )}
       </ul>
+
+      {hasMore && (
+        <button
+          type="button"
+          className={styles.buttonLoad}
+          onClick={handleLoadMore}
+          disabled={loading}
+        >
+          {loading ? 'Завантаження...' : 'Переглянути ще'}
+        </button>
+      )}
     </section>
   );
 }

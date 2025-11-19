@@ -21,8 +21,8 @@ export default function StoriesClient({
   ): Promise<FetchResult | null> => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_DATA_URL}/api/stories`,
-        { params: { page, limit } } 
+        `${process.env.NEXT_PUBLIC_API_URL}/api/stories`,
+        { params: { page, limit } }
       );
 
       const data = res.data.data || res.data;

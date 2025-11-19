@@ -37,7 +37,7 @@ const categories = [
 
 const fetchUserById = async (id: string): Promise<Traveller> => {
   const { data } = await axios.get(
-    `${process.env.NEXT_PUBLIC_DATA_URL}/api/users/${id}`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`
   );
   return data.data.user;
 };
@@ -143,7 +143,7 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
 
   const authorName = author?.name || story.author || 'Невідомий автор';
   const authorAvatar =
-    author?.avatarUrl || story.avatar || '/images/avatar.png';
+    author?.avatarUrl || story.avatar || '/images/avatar.webp.webp';
 
   const isLoading = addFavMutation.isPending || removeFavMutation.isPending;
 

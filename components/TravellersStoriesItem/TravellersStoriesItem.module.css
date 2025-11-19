@@ -48,7 +48,7 @@
 
   display: flex;
   align-items: center;
-  height: 54px;
+  height: 64px;
 }
 
 .description {
@@ -222,7 +222,7 @@
   }
 
   .info {
-    width: 340px;
+    max-width: 340px;
   }
 
   .button {
@@ -248,7 +248,7 @@
   }
 
   .info {
-    width: 421px;
+    max-width: 421px;
     height: 397px;
   }
 

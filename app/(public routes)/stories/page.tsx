@@ -4,7 +4,7 @@ import { mapStory } from '@/types/story';
 async function getInitialStories() {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_DATA_URL}/api/stories?page=1&limit=9`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/stories?page=1&limit=9`,
     );
 
     if (!res.ok) return null;

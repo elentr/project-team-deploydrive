@@ -10,7 +10,7 @@ interface Traveller {
 }
 
 export const nextServer = axios.create({
-  baseURL: `${process.env.API_DATA_BASE_URL}/api`,
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api`,
   withCredentials: true,
 });
 

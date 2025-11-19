@@ -15,7 +15,7 @@ async function getInitialTravellerData(
   travellerId: string
 ): Promise<InitialData | null> {
   const res = await fetch(
-    `${process.env.API_DATA_BASE_URL}/api/users/${travellerId}?page=1`, // або відповідно яка зміна в .env
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users/${travellerId}?page=1`,
     { cache: 'no-store' }
   );
   if (!res.ok) return null;

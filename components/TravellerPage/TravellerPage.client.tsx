@@ -24,7 +24,7 @@ export default function TravellerPageClient({
   ): Promise<FetchResult | null> => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_DATA_URL}/api/users/${travellerId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${travellerId}`,
         { params: { page, perPage: limit } }
       );
 
@@ -45,7 +45,7 @@ export default function TravellerPageClient({
       <TravellerInfo
         traveller={{
           name: initialTraveller.name,
-          photo: initialTraveller.avatarUrl ?? '/images/avatar.png',
+          photo: initialTraveller.avatarUrl ?? '/images/avatar.webp.webp',
           info: initialTraveller.description,
         }}
       />
