@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState, useRef } from "react";
-import css from "./AddStoryForm.module.css";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createStory, fetchCategories } from "@/lib/api/api";
-import type { Category, CreateStoryResponse } from "@/types/story";
-import { useStoryDraft, initialDraft } from "@/lib/store/storyStore";
-import { Modal } from "@/components/CreateStoryErrorModal/Modal";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+import { useEffect, useMemo, useState, useRef } from 'react';
+import css from './AddStoryForm.module.css';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createStory, fetchCategories } from '@/lib/api/api';
+import type { Category, CreateStoryResponse } from '@/types/story';
+import { useStoryDraft, initialDraft } from '@/lib/store/storyStore';
+import { Modal } from '@/components/CreateStoryErrorModal/Modal';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 interface StoryFormProps {
   onSuccess: (id: string) => void;
@@ -17,30 +17,29 @@ interface StoryFormProps {
 
 const validationSchema = Yup.object({
   storyImage: Yup.mixed()
-    .required("Додайте фото до історії")
-    .test("fileType", "Файл має бути у форматі JPEG, PNG або WEBP", (value) => {
+    .required('Додайте фото до історії')
+    .test('fileType', 'Файл має бути у форматі JPEG, PNG або WEBP', value => {
       if (!value) return false;
       const file = value as File;
-      return ["image/jpeg", "image/png", "image/webp"].includes(file.type);
+      return ['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
     })
-    .test("fileSize", "Файл завеликий — максимум 2MB", (value) => {
+    .test('fileSize', 'Файл завеликий — максимум 2MB', value => {
       if (!value) return false;
       const file = value as File;
-      return file.size <= 2 * 1024 * 1024; 
+      return file.size <= 2 * 1024 * 1024;
     }),
 
   title: Yup.string()
     .trim()
-    .max(80, "Максимум 80 символів")
-    .required("Вкажіть заголовок"),
+    .max(80, 'Максимум 80 символів')
+    .required('Вкажіть заголовок'),
 
   description: Yup.string()
     .trim()
-    .max(2500, "Опис занадто великий — максимум 2500 символів")
-    .required("Додайте опис історії"),
+    .max(2500, 'Опис занадто великий — максимум 2500 символів')
+    .required('Додайте опис історії'),
 
-  category: Yup.string()
-    .required("Оберіть категорію"),
+  category: Yup.string().required('Оберіть категорію'),
 });
 
 export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
@@ -53,7 +52,7 @@ export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
   const autoResize = () => {
     const el = bodyRef.current;
     if (!el) return;
-    el.style.height = "auto";
+    el.style.height = 'auto';
     el.style.height = `${el.scrollHeight}px`;
   };
 
@@ -61,17 +60,18 @@ export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
     autoResize();
   }, []);
 
-  const { data: categories, isLoading: isCategoriesLoading } =
-    useQuery<Category[]>({
-      queryKey: ["categories"],
-      queryFn: fetchCategories,
-      staleTime: 5 * 60 * 1000,
-    });
+  const { data: categories, isLoading: isCategoriesLoading } = useQuery<
+    Category[]
+  >({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const mutation = useMutation({
     mutationFn: (fd: FormData) => createStory(fd),
     onSuccess: (data: CreateStoryResponse) => {
-      qc.invalidateQueries({ queryKey: ["myStories"] });
+      qc.invalidateQueries({ queryKey: ['myStories'] });
       clearDraft();
       onSuccess(data.id);
     },
@@ -85,62 +85,55 @@ export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
       storyImage: draft.storyImage ?? null,
       title: draft.title ?? initialDraft.title,
       categoryId: draft.categoryId ?? initialDraft.categoryId,
-      shortDescription: draft.shortDescription ?? "",
+      shortDescription: draft.shortDescription ?? '',
       body: draft.body ?? initialDraft.body,
     },
     enableReinitialize: false,
     validationSchema,
     validateOnChange: true,
     validateOnBlur: true,
-    onSubmit: (values) => {
+    onSubmit: values => {
       const fd = new FormData();
 
-      if (values.storyImage) fd.append("storyImage", values.storyImage);
-      fd.append("title", values.title.trim());
-      fd.append("category", values.categoryId);
-      fd.append("article", values.body.trim());
+      if (values.storyImage) fd.append('storyImage', values.storyImage);
+      fd.append('title', values.title.trim());
+      fd.append('category', values.categoryId);
+      fd.append('article', values.body.trim());
 
       mutation.mutate(fd);
     },
   });
 
+  const previewUrl = useMemo(() => {
+    if (!formik.values.storyImage) return null;
+    return URL.createObjectURL(formik.values.storyImage);
+  }, [formik.values.storyImage]);
 
-const previewUrl = useMemo(() => {
-  if (!formik.values.storyImage) return null;
-  return URL.createObjectURL(formik.values.storyImage);
-}, [formik.values.storyImage]);
+  useEffect(() => {
+    if (!previewUrl) return;
 
+    const url = previewUrl;
 
-useEffect(() => {
-  if (!previewUrl) return;
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [previewUrl]);
 
-  const url = previewUrl;
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
-  return () => {
-    URL.revokeObjectURL(url);
-  };
-}, [previewUrl]);
-
-
-const [hydrated, setHydrated] = useState(false);
-useEffect(() => {
-  setHydrated(true);
-}, []);
-
-  const isSaveDisabled =
-    !formik.isValid ||
-    !formik.dirty ||
-    mutation.isPending;
+  const isSaveDisabled = !formik.isValid || !formik.dirty || mutation.isPending;
 
   function updateDraft(update: Partial<typeof draft>) {
-  setTimeout(() => {
-    setDraft(update);
-  }, 0);
+    setTimeout(() => {
+      setDraft(update);
+    }, 0);
   }
   const shortDescLength = formik.values.shortDescription?.length ?? 0;
   return (
     <form className={css.form} onSubmit={formik.handleSubmit}>
-
       {/* Обкладинка */}
       <div className={css.formGroup}>
         <label className={css.label}>Обкладинка статті</label>
@@ -173,9 +166,9 @@ useEffect(() => {
             type="file"
             accept="image/png,image/jpeg,image/webp"
             className={css.fileHidden}
-            onChange={(e) => {
+            onChange={e => {
               const file = e.target.files?.[0] ?? null;
-              formik.setFieldValue("storyImage", file);
+              formik.setFieldValue('storyImage', file);
               updateDraft({ storyImage: file });
             }}
             onBlur={formik.handleBlur}
@@ -183,7 +176,9 @@ useEffect(() => {
         </div>
 
         {formik.touched.storyImage && formik.errors.storyImage && (
-          <span className={css.error}>{formik.errors.storyImage as string}</span>
+          <span className={css.error}>
+            {formik.errors.storyImage as string}
+          </span>
         )}
       </div>
 
@@ -198,7 +193,7 @@ useEffect(() => {
           className={css.input}
           placeholder="Введіть заголовок"
           value={formik.values.title}
-          onChange={(e) => {
+          onChange={e => {
             formik.handleChange(e);
             updateDraft({ title: e.target.value });
           }}
@@ -222,17 +217,17 @@ useEffect(() => {
           className={css.select}
           disabled={isCategoriesLoading}
           value={formik.values.categoryId}
-          onChange={(e) => {
+          onChange={e => {
             formik.handleChange(e);
             updateDraft({ categoryId: e.target.value });
           }}
           onBlur={formik.handleBlur}
         >
           <option value="" disabled>
-            {isCategoriesLoading ? "Завантаження..." : "Категорія"}
+            {isCategoriesLoading ? 'Завантаження...' : 'Категорія'}
           </option>
-          {(categories ?? []).map((c) => (
-            <option key={c.id} value={c.id}>
+          {(categories ?? []).map(c => (
+            <option key={c._id} value={c._id}>
               {c.name}
             </option>
           ))}
@@ -254,7 +249,7 @@ useEffect(() => {
           className={css.input}
           placeholder="Введіть короткий опис"
           value={formik.values.shortDescription}
-          onChange={(e) => {
+          onChange={e => {
             formik.handleChange(e);
             updateDraft({ shortDescription: e.target.value });
           }}
@@ -264,11 +259,8 @@ useEffect(() => {
         />
 
         <div className={css.hintRow}>
-          {formik.touched.shortDescription &&
-          formik.errors.shortDescription ? (
-            <span className={css.error}>
-              {formik.errors.shortDescription}
-            </span>
+          {formik.touched.shortDescription && formik.errors.shortDescription ? (
+            <span className={css.error}>{formik.errors.shortDescription}</span>
           ) : (
             <span className={css.hint}>Лишилося символів: </span>
           )}
@@ -292,13 +284,12 @@ useEffect(() => {
           placeholder="Ваша історія тут"
           value={formik.values.body}
           rows={1}
-          onChange={(e) => {
+          onChange={e => {
             formik.handleChange(e);
             updateDraft({ body: e.target.value });
             autoResize();
           }}
           onBlur={formik.handleBlur}
-          
         />
         {formik.touched.body && formik.errors.body && (
           <span className={css.error}>{formik.errors.body}</span>
@@ -307,8 +298,12 @@ useEffect(() => {
 
       {/* Дії */}
       <div className={css.actionsWrap}>
-        <button type="submit" className={css.submitBtn} disabled={isSaveDisabled}>
-          {mutation.isPending ? "Збереження..." : "Зберегти"}
+        <button
+          type="submit"
+          className={css.submitBtn}
+          disabled={isSaveDisabled}
+        >
+          {mutation.isPending ? 'Збереження...' : 'Зберегти'}
         </button>
 
         <button type="button" className={css.cancelBtn} onClick={onCancel}>

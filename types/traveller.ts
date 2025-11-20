@@ -1,5 +1,7 @@
 //types/traveller.ts
 
+import { Story } from './story';
+
 export interface Traveller {
   _id: string;
   name: string;
@@ -27,3 +29,11 @@ export const emptyTravelersPage: TravellersPage = {
   hasNextPage: false,
   hasPreviousPage: false,
 };
+
+export interface TravellerClientProps {
+  travellerId: string;
+  initialTraveller: Traveller;
+  initialStories: Story[];
+  initialHasNextPage: boolean;
+  categoriesMap?: Map<string, string>;
+}
