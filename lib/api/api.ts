@@ -13,12 +13,32 @@ export const apiClient = axios.create({
 });
 
 export async function createStory(formData: FormData): Promise<CreateStoryResponse> {
-  const { data } = await clientApi.post<CreateStoryResponse>("/api/stories", formData, {
+  const API = process.env.NEXT_PUBLIC_API_URL || 'https://travellers-node.onrender.com';
+  const baseUrl = API.endsWith('/') ? API.slice(0, -1) : API;
+  const apiPath = baseUrl.endsWith('/api') ? '/stories' : '/api/stories';
+  const url = `${baseUrl}${apiPath}`;
+  
+  const { data } = await clientApi.post<CreateStoryResponse>(url, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return data;
 }
+
 export async function fetchCategories(): Promise<Category[]> {
-  const { data } = await clientApi.get("/api/categories");
-  return data as Category[];
+  const API = process.env.NEXT_PUBLIC_API_URL || 'https://travellers-node.onrender.com';
+  const baseUrl = API.endsWith('/') ? API.slice(0, -1) : API;
+  const apiPath = baseUrl.endsWith('/api') ? '/categories' : '/api/categories';
+  const url = `${baseUrl}${apiPath}`;
+  
+  const { data } = await clientApi.get(url);
+  
+  if (Array.isArray(data)) {
+    return data as Category[];
+  } else if (data.data && Array.isArray(data.data)) {
+    return data.data as Category[];
+  } else if (data.categories && Array.isArray(data.categories)) {
+    return data.categories as Category[];
+  }
+  
+  return [];
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
+import Image from "next/image";
 import css from "./AddStoryForm.module.css";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createStory, fetchCategories } from "@/lib/api/api";
@@ -34,13 +35,18 @@ const validationSchema = Yup.object({
     .max(80, "Максимум 80 символів")
     .required("Вкажіть заголовок"),
 
-  description: Yup.string()
+  body: Yup.string()
     .trim()
     .max(2500, "Опис занадто великий — максимум 2500 символів")
     .required("Додайте опис історії"),
 
-  category: Yup.string()
+  categoryId: Yup.string()
     .required("Оберіть категорію"),
+
+  shortDescription: Yup.string()
+    .trim()
+    .max(61, "Максимум 61 символ")
+    .required("Додайте короткий опис"),
 });
 
 export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
@@ -99,6 +105,9 @@ export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
       fd.append("title", values.title.trim());
       fd.append("category", values.categoryId);
       fd.append("article", values.body.trim());
+      if (values.shortDescription) {
+        fd.append("shortDescription", values.shortDescription.trim());
+      }
 
       mutation.mutate(fd);
     },
@@ -122,11 +131,6 @@ useEffect(() => {
 }, [previewUrl]);
 
 
-const [hydrated, setHydrated] = useState(false);
-useEffect(() => {
-  setHydrated(true);
-}, []);
-
   const isSaveDisabled =
     !formik.isValid ||
     !formik.dirty ||
@@ -148,11 +152,20 @@ useEffect(() => {
         <div className={css.coverRow}>
           <div className={css.coverPreview}>
             {previewUrl ? (
-              <img src={previewUrl} alt="Превʼю" className={css.coverImg} />
+              <Image
+                src={previewUrl}
+                alt="Превʼю"
+                width={280}
+                height={160}
+                className={css.coverImg}
+                unoptimized
+              />
             ) : (
-              <img
-                src="/images/avatar.webp.webp"
+              <Image
+                src="/images/avatar.svg"
                 alt="Дефолтне фото"
+                width={280}
+                height={160}
                 className={css.coverImg}
               />
             )}
@@ -228,11 +241,11 @@ useEffect(() => {
           }}
           onBlur={formik.handleBlur}
         >
-          <option value="" disabled>
+          <option key="default" value="" disabled>
             {isCategoriesLoading ? "Завантаження..." : "Категорія"}
           </option>
-          {(categories ?? []).map((c) => (
-            <option key={c.id} value={c.id}>
+          {(categories ?? []).map((c, index) => (
+            <option key={c.id || `category-${index}`} value={c.id}>
               {c.name}
             </option>
           ))}
@@ -273,9 +286,7 @@ useEffect(() => {
             <span className={css.hint}>Лишилося символів: </span>
           )}
 
-          {hydrated && (
-            <span className={css.counter}>{61 - shortDescLength}</span>
-          )}
+          <span className={css.counter}>{61 - shortDescLength}</span>
         </div>
       </div>
 
