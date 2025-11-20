@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import styles from './TravellersStoriesItem.module.css';
 
 export interface Story {
@@ -59,7 +60,12 @@ export default function TravellersStoriesItem({ story }: Props) {
       </div>
 
       <div className={styles.footer}>
-        <button className={styles.button}>Переглянути статтю</button>
+        <Link
+          href={`/stories/${story._id}`}
+          className={styles.button}
+        >
+          Переглянути статтю
+        </Link>
 
         <Image
           src="/icons/bookmark.svg"

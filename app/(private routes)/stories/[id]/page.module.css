@@ -1,0 +1,39 @@
+.story {
+    background-color: #f7f9ff;
+    display: block;
+    box-sizing: border-box;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
+
+.title {
+
+    color: #000000;
+    font-size: 56px;
+    max-width: 1440px;
+    padding: 0 64px;
+    margin: 0 auto;
+    margin-top: 48px;
+    margin-bottom: 32px;
+}
+
+
+@media screen and (min-width: 768px) and (max-width: 1439px) {
+    .title {
+        max-width: 768px;
+        margin-top: 32px;
+        margin-bottom: 32px;
+        padding: 0 32px;
+        font-size: 48px;
+    }
+
+}
+
+@media screen and (min-width: 320px) and (max-width: 767px) {
+    .title {
+        font-size: 32px;
+        max-width: 375px;
+        padding: 0 20px;
+    }
+}
