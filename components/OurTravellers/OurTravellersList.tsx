@@ -9,9 +9,13 @@ interface Props {
 export default function OurTravellersList({ travellers }: Props) {
   if (!travellers.length) return <p>Немає мандрівників.</p>;
 
+  const uniqueTravellers = Array.from(
+    new Map(travellers.map(t => [t._id, t])).values()
+  );
+
   return (
     <ul className={styles.list}>
-      {travellers.map(t => (
+      {uniqueTravellers.map(t => (
         <li key={t._id} className={styles.item}>
           <TravellerCard traveller={t} />
         </li>

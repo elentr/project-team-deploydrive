@@ -1,24 +1,69 @@
+//lib/api/api.ts
+
 import axios from 'axios';
-import { clientApi } from "./clientApi";
-import type { Category, CreateStoryResponse } from "@/types/story";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL + '/api';
-
-export const apiClient = axios.create({
-  baseURL,
+export const nextServer = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api`,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
-export async function createStory(formData: FormData): Promise<CreateStoryResponse> {
-  const { data } = await clientApi.post<CreateStoryResponse>("/api/stories", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return data;
+let refreshPromise: Promise<string> | null = null;
+
+async function refreshAccessToken() {
+  if (!refreshPromise) {
+    refreshPromise = nextServer
+      .post('/auth/refresh')
+      .then(res => {
+        const token = res.data.data?.accessToken;
+        if (!token) throw new Error('Invalid refresh response');
+
+        localStorage.setItem('accessToken', token);
+        return token;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  return refreshPromise;
 }
-export async function fetchCategories(): Promise<Category[]> {
-  const { data } = await clientApi.get("/api/categories");
-  return data as Category[];
-}
+
+nextServer.interceptors.request.use(config => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
+// ЛОВИМ 401/498 И ОБНОВЛЯЕМ ТОКЕН
+nextServer.interceptors.response.use(
+  res => res,
+  async error => {
+    const originalRequest = error.config;
+
+    // 498 — токен устарел
+    // 401 — токен плохой
+    if (
+      (error.response?.status === 498 || error.response?.status === 401) &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        const newToken = await refreshAccessToken();
+
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+        return nextServer(originalRequest);
+      } catch (refreshErr) {
+        localStorage.removeItem('accessToken');
+        return Promise.reject(refreshErr);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);

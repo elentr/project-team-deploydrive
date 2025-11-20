@@ -1,4 +1,4 @@
-import { Story } from './story';
+//types/traveller.ts
 
 export interface Traveller {
   _id: string;
@@ -8,10 +8,22 @@ export interface Traveller {
   articlesAmount: number;
 }
 
-export interface TravellerClientProps {
-  travellerId: string;
-  initialTraveller: Traveller;
-  initialStories: Story[];
-  initialHasNextPage: boolean;
-  categoriesMap?: Map<string, string>;
+export interface TravellersPage {
+  data: Traveller[];
+  page: number;
+  perPage: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
+
+export const emptyTravelersPage: TravellersPage = {
+  data: [],
+  page: 1,
+  perPage: 10,
+  totalItems: 0,
+  totalPages: 1,
+  hasNextPage: false,
+  hasPreviousPage: false,
+};
