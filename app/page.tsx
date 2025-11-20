@@ -1,5 +1,3 @@
-import styles from './page.module.css';
-
 import Hero from '@/components/Hero/Hero';
 import Popular from '@/components/Popular/Popular';
 import OurTravellers from '@/components/OurTravellers/OurTravellers';
@@ -11,7 +9,7 @@ export default function Home() {
     <>
       <Hero />
       <About />
-      <Popular />
+      {/*<Popular />*/}
       <OurTravellers />
       <Join />
     </>

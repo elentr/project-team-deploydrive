@@ -103,9 +103,24 @@
 
 .copyright p {
   font-size: 12px;
-  color: #666;
+  color: #000;
   margin: 0;
   font-weight: 400;
+}
+
+.auhtFooter {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px 0;
+  background-color: #fff;
+  text-align: center;
+  z-index: 50;
+}
+
+.auhtFooter p {
+  font-size: 12px;
 }
 /* Tablet - 768px */
 @media (min-width: 768px) {

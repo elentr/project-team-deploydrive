@@ -1,33 +1,14 @@
 // components/AuthPage/AuthPage.tsx
-"use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { checkSession } from "@/lib/api/clientApi";
-import Link from "next/link";
-import styles from "./AuthPage.module.css";
-import LoginForm from "./LoginForm";
-import RegistrationForm from "./RegistrationForm";
+import styles from './AuthPage.module.css';
+import Link from 'next/link';
+import dynamic from 'next/dynamic';
 
-export default function AuthPage({ type }: { type: "login" | "register" }) {
-  const router = useRouter();
+// динамические client-компоненты
+const LoginForm = dynamic(() => import('./LoginForm'));
+const RegistrationForm = dynamic(() => import('./RegistrationForm'));
 
-  // Перевірка, чи вже залогінений
-  const { data: isAuthenticated, isLoading } = useQuery({
-    queryKey: ["session"],
-    queryFn: checkSession,
-    staleTime: Infinity,
-  });
-
-  useEffect(() => {
-    if (isAuthenticated === true) {
-      router.replace("/");
-    }
-  }, [isAuthenticated, router]);
-
-  if (isLoading) return null;
-
+export default function AuthPage({ type }: { type: 'login' | 'register' }) {
   return (
     <section>
       <div className="container">
@@ -36,20 +17,20 @@ export default function AuthPage({ type }: { type: "login" | "register" }) {
           <div className={styles.tabsWrapper}>
             <Link
               href="/auth/register"
-              className={`${styles.tab} ${type === "register" ? styles.active : ""}`}
+              className={`${styles.tab} ${type === 'register' ? styles.active : ''}`}
             >
               Реєстрація
             </Link>
             <Link
               href="/auth/login"
-              className={`${styles.tab} ${type === "login" ? styles.active : ""}`}
+              className={`${styles.tab} ${type === 'login' ? styles.active : ''}`}
             >
               Вхід
             </Link>
           </div>
 
           {/* Заголовки */}
-          {type === "login" ? (
+          {type === 'login' ? (
             <>
               <h2 className={styles.authTitle}>Вхід</h2>
               <p className={styles.authSubtitle}>Ласкаво просимо назад!</p>
@@ -64,7 +45,7 @@ export default function AuthPage({ type }: { type: "login" | "register" }) {
           )}
 
           {/* Форма */}
-          {type === "login" ? <LoginForm /> : <RegistrationForm />}
+          {type === 'login' ? <LoginForm /> : <RegistrationForm />}
         </div>
       </div>
     </section>

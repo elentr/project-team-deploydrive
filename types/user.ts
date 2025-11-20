@@ -1,17 +1,24 @@
+//types/user.ts
+
 export interface User {
   _id: string;
   name: string;
-  email: string;
-  avatarUrl?: string;
-  description?: string;
-  articlesAmount?: number;
-  savedStories?: string[];
+  email?: string;
+  avatarUrl: string;
+  articlesAmount: number;
+  description: string;
+  favouriteArticles: string[];
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface AuthCredentials {
+export interface LoginPayload {
   email: string;
   password: string;
-  name?: string;
+}
+
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
 }

@@ -1,56 +1,57 @@
-export type Category = {
-  id: string;
-  name: string;
-};
+//types/story.ts
 
-export type CreateStoryResponse = {
-  id: string;
-};
+import { User } from './user';
 
-export type ApiStory = {
-  _id: string;
-  img: string;
-  title: string;
-  article: string;
-  categoryName: string;
-  date: string;
-  ownerId: string;
-  favoriteCount: number;
-};
-
+// Основная сущность истории
 export interface Story {
   _id: string;
-  category: string;
   title: string;
-  description: string;
-  author: string;
-  date: string;
-  readTime: number;
+  category: Category;
+  article: string;
   img: string;
-  avatar?: string;
+  ownerId: Owner;
+  date: string;
+  favoriteCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface PaginatedStoriesResponse {
+// Пагинация для историй
+export interface StoriesResponse {
   data: Story[];
-  totalPages: number;
-  totalItems: number;
   page: number;
   perPage: number;
-  hasNextPage?: boolean;
-  hasPreviousPage?: boolean;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
-export const mapStory = (s: ApiStory): Story => ({
-  _id: s._id,
-  title: s.title,
-  img: s.img,
-  description:
-    s.article.length > 200 ? s.article.slice(0, 200) + '...' : s.article,
-  category: s.categoryName,
-  author: 'Автор', // заглушка, якщо немає автора з бекенду
-  date: s.date,
-  readTime: 1,
-  avatar: '/images/avatar.png',
-});
+// Ответ на добавление в избранное
+export interface StoryFavoriteResponse {
+  user: User;
+  story: Story;
+}
 
-export {};
+export interface PaginatedResponse<T> {
+  data: T[];
+  page: number;
+  perPage: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+// Категория
+export interface Category {
+  _id: string;
+  name: string;
+}
+
+// Владелец истории
+export interface Owner {
+  _id: string;
+  name: string;
+  avatarUrl: string | null;
+}

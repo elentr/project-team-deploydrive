@@ -35,15 +35,6 @@ export default function OurTravellers() {
         },
       });
 
-      console.log('===== FETCH START =====');
-      console.log('Page:', page);
-      console.log('PerPage:', page === 1 ? INITIAL : LOAD);
-      console.log('Raw response:', res.data);
-      console.log('Returned data length:', res.data.data.data.length);
-      console.log('Returned items:', res.data.data.data);
-      console.log('Has next page:', res.data.data.hasNextPage);
-      console.log('===== FETCH END =====');
-
       let data = res.data.data.data;
       const hasNextPage = res.data.data.hasNextPage;
 
@@ -57,7 +48,11 @@ export default function OurTravellers() {
         }
       }
 
-      setTravellers(prev => [...prev, ...data]);
+      setTravellers(prev => {
+        const all = [...prev, ...data];
+        const unique = Array.from(new Map(all.map(t => [t._id, t])).values());
+        return unique;
+      });
 
       setHasMore(hasNextPage);
       setPage(prev => prev + 1);
