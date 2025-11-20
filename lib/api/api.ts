@@ -67,3 +67,17 @@ nextServer.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Создать историю
+export async function createStory(formData: FormData) {
+  const r = await nextServer.post('/stories', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return r.data.data;
+}
+
+// Получить список категорий
+export async function fetchCategories() {
+  const r = await nextServer.get('/categories');
+  return r.data.data;
+}

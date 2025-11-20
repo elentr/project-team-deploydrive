@@ -12,6 +12,7 @@ import type {
 import type { ApiResponse } from '@/types/api';
 
 import { nextServer } from '@/lib/api/api';
+import { NextServer } from 'next/dist/server/next';
 
 type VerifyEmailResponse = {
   message: string;
@@ -212,3 +213,26 @@ export const removeStoryFromSave = async (storyId: string) => {
   const response = await nextServer.delete(`/users/me/saved/${storyId}`);
   return response.data;
 };
+
+// Добавить историю в избранное
+export async function favouriteAdd(storyId: string): Promise<Story> {
+  const r = await nextServer.post(`/stories/${storyId}/favorite`);
+  return r.data.data.story;
+}
+
+// Убрать историю из избранного
+export async function favouriteRemove(storyId: string): Promise<Story> {
+  const r = await nextServer.delete(`/stories/${storyId}/favorite`);
+  return r.data.data.story;
+}
+
+// Обновить количество лайков (используется в UI)
+export async function updateStoryLikes(
+  storyId: string,
+  likes: string
+): Promise<Story> {
+  const r = await nextServer.patch(`/stories/${storyId}/likes`, {
+    favoriteCount: likes,
+  });
+  return r.data.data;
+}
