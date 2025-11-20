@@ -1,41 +1,89 @@
 .section {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  margin-top: 64px;
+  padding: 64px 16px;
+  min-width: 320px;
+  max-width: 375px;
+  background: var(--color-scheme-2-background);
+
+  margin: 0 auto;
 }
 
 .title {
-  font-size: 32px;
+  font-family: var(--second-family);
   font-weight: 700;
-  margin-bottom: 12px;
+  font-size: 28px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--color-scheme-1-text);
+  margin-bottom: 24px;
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 24px;
 }
 
+/* Кнопка "Показати ще" */
+.buttonLoad {
+  margin: 32px auto 0;
+  padding: 6px 12px;
+  height: 48px;
+  min-width: 163px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #4169e1;
+  color: white;
+  border-radius: 8px;
+  border: 1px solid #4169e1;
+  font-size: 16px;
+  cursor: pointer;
+
+  transition:
+    background cubic-bezier(0.075, 0.82, 0.165, 1),
+    color cubic-bezier(0.075, 0.82, 0.165, 1),
+    border cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.buttonLoad:hover,
+.buttonLoad:focus {
+  border: 1px solid var(--color-royal-blue);
+  background: var(--color-royal-blue-lighter);
+  color: #000;
+}
+
+.buttonLoad:active {
+  border: 1px solid var(--color-royal-blue);
+  background: var(--color-royal-blue-light);
+  color: #000;
+}
+
 @media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
+  .section {
+    padding: 64px 32px;
+    max-width: 768px;
+  }
+
+  .title {
+    font-size: 44px;
+  }
+
+  .grid > * {
+    width: calc((100% - 24px) / 2);
   }
 }
 
 @media (min-width: 1440px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
+  .section {
+    padding: 72px 64px;
+    max-width: 1440px;
   }
-}
 
-.button {
-  width: fit-content;
-  padding: 14px 28px;
-  background: #e7ecf3;
-  border: 1px solid #c5ccd7;
-  border-radius: 16px;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 0 auto;
+  .title {
+    font-size: 52px;
+  }
+
+  .grid > * {
+    width: calc((100% - 48px) / 3);
+  }
 }

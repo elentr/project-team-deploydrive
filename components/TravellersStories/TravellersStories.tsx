@@ -1,130 +1,110 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
-import TravellersStoriesItem from "../TravellersStoriesItem/TravellersStoriesItem";
-import styles from "./TravellersStories.module.css";
+import { useState, useEffect, useMemo } from 'react';
+import styles from './TravellersStories.module.css';
+import TravellersStoriesItem from '../TravellersStoriesItem/TravellersStoriesItem';
+import { Story } from '@/types/story';
+import { Traveller } from '@/types/traveller';
 
-import type { Story } from "../TravellersStoriesItem/TravellersStoriesItem";
+export type FetchResult = {
+  data: Story[];
+  hasNextPage: boolean;
+};
 
-interface ApiStory {
-  _id: string;
-  img: string;
-  title: string;
-  article: string;
-  categoryName: string;
-  date: string;
-  ownerId: string;
-  favoriteCount: number;
+interface Props {
+  initialStories: Story[];
+  initialHasMore: boolean;
+  travellers?: Traveller[];
+  fetchNextPage: (page: number, limit: number) => Promise<FetchResult | null>;
 }
 
-const SHOW_PER_PAGE = 9;
-const SERVER_PER_PAGE = 10;
-
-// mapper
-function mapStory(api: ApiStory): Story {
-  return {
-    _id: api._id,
-    img: api.img,
-    title: api.title,
-    category: api.categoryName,
-    description: api.article.slice(0, 180) + "...",
-    author: "Автор",
-    avatar: "/images/avatar.png",
-    date: api.date,
-    readTime: 1,
-  };
-}
-
-export default function TravellersStories() {
-  const [allStories, setAllStories] = useState<Story[]>([]);
-  const [visibleStories, setVisibleStories] = useState<Story[]>([]);
+export default function TravellersStories({
+  initialStories,
+  initialHasMore,
+  fetchNextPage,
+  travellers = [],
+}: Props) {
+  const [stories, setStories] = useState<Story[]>(initialStories);
   const [page, setPage] = useState(1);
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [loading, setLoading] = useState(false);
 
-  // ----------- FETCH PAGE -------------
-  const fetchPage = useCallback(async (pageNumber: number) => {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/stories`,
-      { params: { page: pageNumber, limit: SERVER_PER_PAGE } }
-    );
-
-    const items = res.data.data.data.map(mapStory);
-
-    // додаємо у глобальний список
-    setAllStories(prev => [...prev, ...items]);
-    setHasMore(res.data.data.hasNextPage);
-  }, []);
-
-  // ----------- INITIAL LOAD -----------
-  useEffect(() => {
-    (async () => {
-      await fetchPage(1);
-    })();
-  }, [fetchPage]);
-
-  // ----------- UPDATE VISIBLE LIST -----------
-  useEffect(() => {
-    (async () => {
-      const filtered =
-        activeCategory === "all"
-          ? allStories
-          : allStories.filter(s => s.category === activeCategory);
-
-      const slice = filtered.slice(0, page * SHOW_PER_PAGE);
-
-      await Promise.resolve();
-      setVisibleStories(slice);
-    })();
-  }, [allStories, page, activeCategory]);
-
-  // ----------- FILTER BUTTON -----------
-  const handleFilter = (cat: string) => {
-    setActiveCategory(cat);
-    setPage(1);
-    setVisibleStories([]); // очищаємо перед новим застосуванням
+  const getResponsiveLimit = () => {
+    if (typeof window === 'undefined') return 9;
+    if (window.innerWidth < 768) return 4;
+    if (window.innerWidth < 1440) return 6;
+    return 9;
   };
 
-  // ----------- LOAD MORE -----------
-  const loadMore = async () => {
-    const next = page + 1;
-    setPage(next);
+  const [limit, setLimit] = useState(9);
 
-    // якщо нам НЕ вистачає карток — догружаємо наступну сторінку
-    if (allStories.length < next * SHOW_PER_PAGE) {
-      await fetchPage(next);
+  const travellersMap = useMemo(() => {
+    return new Map(travellers.map(t => [t._id, t]));
+  }, [travellers]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const newLimit = getResponsiveLimit();
+      setLimit(newLimit);
+      if (page === 1) {
+        setStories(initialStories.slice(0, newLimit));
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [page, initialStories]);
+
+  const handleLoadMore = async () => {
+    if (!hasMore || loading) return;
+    setLoading(true);
+
+    try {
+      const result = await fetchNextPage(page + 1, limit);
+
+      if (result) {
+        setStories(prev => {
+          const existingIds = new Set(prev.map(s => s._id));
+          const uniqueNewStories = result.data.filter(
+            newStory => !existingIds.has(newStory._id)
+          );
+          return [...prev, ...uniqueNewStories];
+        });
+
+        setPage(prev => prev + 1);
+        setHasMore(result.hasNextPage);
+      }
+    } catch (error) {
+      console.error('Error loading stories:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
-        <h2 className={styles.title}>Історії мандрівників</h2>
-
-        <div className={styles.filters}>
-          {["all", "Європа", "Азія", "Пустелі", "Африка", "Америка", "Гори"].map(id => (
-            <button
-              key={id}
-              className={`${styles.filterBtn} ${
-                activeCategory === id ? styles.filterBtnActive : ""
-              }`}
-              onClick={() => handleFilter(id)}
-            >
-              {id === "all" ? "Всі історії" : id}
-            </button>
+        <ul className={styles.travellerList}>
+          {stories.map(story => (
+            <li key={story._id} className={styles.listItem}>
+              <TravellersStoriesItem
+                story={story}
+                travellersMap={travellersMap}
+              />
+            </li>
           ))}
-        </div>
-
-        <div className={styles.grid}>
-          {visibleStories.map(s => (
-            <TravellersStoriesItem key={s._id} story={s} />
-          ))}
-        </div>
+        </ul>
 
         {hasMore && (
-          <button className={styles.buttonLoad} onClick={loadMore}>
-            Показати ще
+          <button
+            type="button"
+            className={styles.buttonLoad}
+            onClick={handleLoadMore}
+            disabled={loading}
+          >
+            {loading ? 'Завантаження...' : 'Переглянути ще'}
           </button>
         )}
       </div>

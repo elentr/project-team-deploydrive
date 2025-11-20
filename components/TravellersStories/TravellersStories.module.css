@@ -1,86 +1,84 @@
 /* Контейнер секції */
 .section {
-    padding-top: 40px;
-    padding-bottom: 40px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .inner {
-    width: 100%;
-    max-width: 1312px;
-    margin: 0 auto;
+  width: 100%;
+  max-width: 1312px;
+  margin: 0 auto;
 }
 
 /* Заголовок */
 .title {
-    font-weight: 700;
-    font-family: "Sora", sans-serif;
-    font-size: 62px;
-    line-height: 110%;
-    text-align: center;
-    margin-bottom: 32px;
+  font-weight: 700;
+  font-family: 'Sora', sans-serif;
+  font-size: 62px;
+  line-height: 110%;
+  text-align: center;
+  margin-bottom: 32px;
 }
 
-/* Фільтрація */
-.filters {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
+.travellerList {
+  display: grid;
+  gap: 24px;
+
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  grid-template-columns: 1fr;
 }
 
-.filterBtn {
-    padding: 6px 12px;
-    border-radius: 8px;
-    background: #F7F8FC;
-    border: 1px solid transparent;
-    cursor: pointer;
-    font-size: 16px;
-    white-space: nowrap;
-    color: #000;
-}
-
-/* АКТИВНА кнопка */
-.filterBtnActive {
-    background: #F2F2F2;
-    color: #000;
-    border: 1px solid transparent;
-}
-
-/* Сітка карток */
-.grid {
-    display: grid;
-    gap: 24px;
-}
-
+/* Планшет: 2 колонки */
 @media (min-width: 768px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .travellerList {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
+/* Десктоп: 3 колонки */
 @media (min-width: 1440px) {
-    .grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+  .travellerList {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* Кнопка "Показати ще" */
 .buttonLoad {
-    margin: 32px auto 0;
-    padding: 6px 12px;
-    height: 48px;
-    min-width: 163px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #4169E1;
-    color: white;
-    border-radius: 8px;
-    border: 1px solid #4169E1;
-    font-size: 16px;
-    cursor: pointer;
+  margin: 32px auto 0;
+  padding: 6px 12px;
+  height: 48px;
+  min-width: 163px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #4169e1;
+  color: white;
+  border-radius: 8px;
+  border: 1px solid #4169e1;
+  font-size: 16px;
+  cursor: pointer;
+
+  transition:
+    background cubic-bezier(0.075, 0.82, 0.165, 1),
+    color cubic-bezier(0.075, 0.82, 0.165, 1),
+    border cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.buttonLoad:hover,
+.buttonLoad:focus {
+  border: 1px solid var(--color-royal-blue);
+  background: var(--color-royal-blue-lighter);
+  color: #000;
+}
+
+.buttonLoad:active {
+  border: 1px solid var(--color-royal-blue);
+  background: var(--color-royal-blue-light);
+  color: #000;
 }

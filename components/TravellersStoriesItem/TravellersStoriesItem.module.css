@@ -1,17 +1,21 @@
 .card {
-  background: #f4f6fb;
-  padding: 16px;
-  border-radius: 24px;
+  background: #e8eeff;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+
+  border: 0px solid var(--color-scheme-1-border);
+  border-radius: 16px;
+  min-width: 300px;
+  max-width: 335px;
+  height: 575px;
 }
 
 .imageWrapper {
   position: relative;
   width: 100%;
-  height: 260px;
-  border-radius: 16px;
+  height: 223px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
   overflow: hidden;
 }
 
@@ -19,58 +23,279 @@
   object-fit: cover;
 }
 
-.iconOverlay {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 50%;
-  padding: 6px;
+.info {
+  padding: 24px;
+  max-width: 335px;
+  height: 352px;
 }
 
 .category {
-  font-size: 14px;
-  color: #78818f;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #000;
+  margin-bottom: 8px;
 }
 
 .title {
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 130%;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #000;
+  margin-bottom: 8px;
+
+  display: flex;
+  align-items: center;
+  height: 64px;
 }
 
 .description {
-  font-size: 15px;
-  line-height: 140%;
-  color: #495057;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #000;
+  margin-bottom: 24px;
 }
 
 .authorBox {
+  max-width: 287px;
+  height: 48px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  margin-bottom: 24px;
 }
 
 .avatar {
-  border-radius: 50%;
+  border-radius: 100%;
+  width: 48px;
+  height: 48px;
+  margin-right: 16px;
+}
+
+.autorWrapp {
+  display: flex;
+  align-items: center;
+}
+
+.name {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #000;
+  display: block;
+}
+
+.date {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #000;
+  margin-right: 8px;
+}
+
+.dot {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 20px;
+  color: #000;
+  margin-right: 3px;
+}
+
+.save {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #000;
+  margin-right: 2px;
+}
+
+.bookmarkLittle {
+  width: 12px;
+  height: 10px;
+  fill: #000;
 }
 
 .footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 12px;
 }
 
 .button {
-  padding: 12px 24px;
-  background: #eef2f7;
-  border: 1px solid #cdd5df;
-  border-radius: 16px;
-  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 8px 18px;
+  min-width: 196px;
+  max-width: 230px;
+  width: 100%;
+  height: 46px;
+
+  background: rgba(0, 0, 0, 0.05);
+
+  font-family: var(--font-family);
   font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: center;
+  color: #000;
+  margin-right: 10px;
+
+  transition:
+    color cubic-bezier(0.075, 0.82, 0.165, 1),
+    background cubic-bezier(0.075, 0.82, 0.165, 1),
+    border cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
-.bookmark {
+.button:hover,
+.button:focus {
+  border: 1px solid var(--opacity-transparent);
+  background: var(--color-royal-blue);
+  color: var(--color-white);
+}
+
+.button:active {
+  border: 1px solid var(--opacity-transparent);
+  background: var(--color-royal-blue-darker);
+  color: var(--color-white);
+}
+
+.bookmarkBtn {
   cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 10px;
+  width: 46px;
+  height: 46px;
+
+  background: rgba(0, 0, 0, 0.05);
+
+  transition:
+    fill cubic-bezier(0.075, 0.82, 0.165, 1),
+    background cubic-bezier(0.075, 0.82, 0.165, 1),
+    border cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.bookmarkBtn:hover,
+.bookmarkBtn:focus {
+  border: 1px solid var(--opacity-transparent);
+  background: var(--color-royal-blue);
+  fill: #fff;
+}
+
+.bookmarkBtn:active {
+  border: 1px solid var(--opacity-transparent);
+  background: var(--color-royal-blue-darker);
+  fill: #fff;
+}
+
+.favorButtonPush {
+  border: 1px solid var(--opacity-transparent);
+  background: var(--color-royal-blue-darker);
+  fill: #fff;
+
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 10px;
+  width: 46px;
+  height: 46px;
+}
+
+@media only screen and (min-width: 768px) {
+  .card {
+    min-width: 340px;
+    height: 578px;
+  }
+
+  .imageWrapper {
+    width: 340px;
+    height: 226px;
+    position: relative;
+    width: 100%;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    overflow: hidden;
+  }
+
+  .info {
+    max-width: 340px;
+  }
+
+  .button {
+    width: 234px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .card {
+    min-width: 421px;
+    height: 677px;
+  }
+
+  .imageWrapper {
+    position: relative;
+    width: 421px;
+    width: 100%;
+
+    height: 280px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    overflow: hidden;
+  }
+
+  .info {
+    max-width: 421px;
+    height: 397px;
+  }
+
+  .category {
+    font-size: 16px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .description {
+    font-size: 18px;
+  }
+
+  .authorBox {
+    width: 373px;
+    height: 54px;
+  }
+
+  .avatar {
+    margin-right: 5px;
+  }
+
+  .name {
+    font-size: 16px;
+  }
+
+  .date {
+    font-size: 16px;
+  }
+
+  .dot {
+    font-size: 30px;
+  }
+
+  .save {
+    font-size: 16px;
+  }
+
+  .bookmarkLittle {
+    width: 14px;
+    height: 16px;
+  }
+
+  .button {
+    min-width: 315px;
+    font-size: 18px;
+  }
 }
