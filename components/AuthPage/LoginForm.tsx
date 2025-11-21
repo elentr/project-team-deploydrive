@@ -1,5 +1,3 @@
-//components/AuthPage/LoginForm.tsx
-
 'use client';
 
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -32,7 +30,7 @@ export default function LoginForm() {
     mutationFn: login,
     onSuccess: user => {
       setUser(user);
-      toast.success(`З поверненням, ${user.name}!`);
+      toast.success(`З поверненням, ${user.name || 'мандрівнику'}! 🌍`);
       router.replace('/');
     },
     onError: error => {
@@ -43,7 +41,10 @@ export default function LoginForm() {
 
   return (
     <Formik
-      initialValues={{ email: '', password: '' }}
+      initialValues={{
+        email: '',
+        password: '',
+      }}
       validationSchema={schema}
       onSubmit={(values, { setSubmitting }) => {
         mutation.mutate(values, {

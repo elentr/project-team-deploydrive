@@ -20,15 +20,14 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const isAuthReady = useAuthStore(s => s.isAuthReady);
-  const isAuth = useAuthStore(s => s.isAuthenticated);
-  const user = useAuthStore(s => s.user);
-  const logoutStore = useAuthStore(s => s.logout);
-
   const type = pathname === '/' ? 'secondary' : 'primary';
 
   const cleanPath = pathname.split('?')[0];
   const authPage = ['/auth/login', '/auth/register'].includes(cleanPath);
+
+  const isAuth = useAuthStore(s => s.isAuthenticated);
+  const user = useAuthStore(s => s.user);
+  const logoutStore = useAuthStore(s => s.logout);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -54,8 +53,6 @@ export default function Header() {
       router.replace('/');
     }
   };
-
-  if (!isAuthReady) return null;
 
   return (
     <header
@@ -90,7 +87,7 @@ export default function Header() {
               </li>
 
               <li className={styles.navItem}>
-                <Link href="/travellers" onClick={closeMenu}>
+                <Link href="/travelers" onClick={closeMenu}>
                   Мандрівники
                 </Link>
               </li>

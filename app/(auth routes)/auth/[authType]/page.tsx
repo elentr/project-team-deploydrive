@@ -1,5 +1,3 @@
-//app/(auth routes)/auth/[authType]/page.tsx
-
 'use client';
 
 import { use } from 'react';
@@ -11,9 +9,7 @@ export default function AuthPageRoute({
   params: Promise<{ authType: string }>;
 }) {
   const { authType } = use(params);
-
-  const type: 'login' | 'register' =
-    authType === 'login' ? 'login' : 'register';
+  const type = authType === 'login' ? 'login' : 'register';
 
   return <AuthPage type={type} />;
 }

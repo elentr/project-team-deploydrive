@@ -1,5 +1,5 @@
-import Link from "next/link";
-import styles from "./AuthProfileEditProvider.module.css";
+import Link from 'next/link';
+import styles from './AuthProfileEditProvider.module.css';
 
 interface AuthProfileEditProviderProps {
   children: React.ReactNode;
@@ -12,7 +12,7 @@ const AuthProfileEditProvider = ({
     <div className={styles.content}>
       <div className={styles.providercontainer}>
         <header className={styles.logowrapper}>
-          <Link className={styles.link} href={"/"}>
+          <Link className={styles.link} href={'/'}>
             <svg className={styles.logo} width="23" height="23">
               <use href="/icons.svg#icon-logo_plant"></use>
             </svg>

@@ -1,14 +1,33 @@
 // components/AuthPage/AuthPage.tsx
+'use client';
 
-import styles from './AuthPage.module.css';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { checkSession } from '@/lib/api/clientApi';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
-
-// динамические client-компоненты
-const LoginForm = dynamic(() => import('./LoginForm'));
-const RegistrationForm = dynamic(() => import('./RegistrationForm'));
+import styles from './AuthPage.module.css';
+import LoginForm from './LoginForm';
+import RegistrationForm from './RegistrationForm';
 
 export default function AuthPage({ type }: { type: 'login' | 'register' }) {
+  const router = useRouter();
+
+  // Перевірка, чи вже залогінений
+  const { data: isAuthenticated, isLoading } = useQuery({
+    queryKey: ['session'],
+    queryFn: checkSession,
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    if (isAuthenticated === true) {
+      router.replace('/');
+    }
+  }, [isAuthenticated, router]);
+
+  if (isLoading) return null;
+
   return (
     <section>
       <div className="container">

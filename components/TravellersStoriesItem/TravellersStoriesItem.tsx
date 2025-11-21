@@ -46,19 +46,19 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
   const router = useRouter();
   const { user, isAuthenticated, setUser } = useAuthStore();
 
-  const authorFromMap = travellersMap?.get(story.owner._id);
+  const authorFromMap = travellersMap?.get(story.ownerId);
 
   const { data: authorFromApi } = useQuery({
-    queryKey: ['user', story.owner],
-    queryFn: () => fetchUserById(story.owner._id),
-    enabled: !authorFromMap && !!story.owner,
+    queryKey: ['user', story.ownerId],
+    queryFn: () => fetchUserById(story.ownerId),
+    enabled: !authorFromMap && !!story.ownerId,
     staleTime: 1000 * 60 * 10,
   });
 
   const author = authorFromMap || authorFromApi;
 
-  const isOwner = user?._id === story.owner._id;
-  const isSaved = user?.favouriteArticles?.includes(story._id) ?? false;
+  const isOwner = user?._id === story.ownerId;
+  const isSaved = user?.savedStories?.includes(story._id) ?? false;
 
   const [likes, setLikes] = useState(story.favoriteCount ?? 0);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -67,7 +67,7 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
   const categoryName =
-    categories.find(c => c._id === story.category._id)?.name || 'Категорія';
+    categories.find(c => c._id === story.category)?.name || 'Категорія';
 
   const addFavMutation = useMutation({
     mutationFn: async () =>
@@ -77,9 +77,9 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
       ]),
     onSuccess: ([_, updated]) => {
       if (!user) return;
-      const currentSaved = user.favouriteArticles || [];
-      setUser({ ...user, favouriteArticles: [...currentSaved, story._id] });
-      setLikes(updated?.favoriteCount ?? likes + 1);
+      const currentSaved = user.savedStories || [];
+      setUser({ ...user, savedStories: [...currentSaved, story._id] });
+      setLikes(updated?.data?.favoriteCount ?? likes + 1);
     },
     onError: error => console.error(error),
   });
@@ -92,12 +92,12 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
       ]),
     onSuccess: ([_, updated]) => {
       if (!user) return;
-      const currentSaved = user.favouriteArticles || [];
+      const currentSaved = user.savedStories || [];
       setUser({
         ...user,
-        favouriteArticles: currentSaved.filter(id => id !== story._id),
+        savedStories: currentSaved.filter(id => id !== story._id),
       });
-      setLikes(updated?.favoriteCount ?? likes - 1);
+      setLikes(updated?.data?.favoriteCount ?? likes - 1);
     },
     onError: error => console.error(error),
   });
@@ -141,9 +141,9 @@ export default function TravellersStoriesItem({ story, travellersMap }: Props) {
     }
   };
 
-  const authorName = author?.name || story.owner.name || 'Невідомий автор';
+  const authorName = author?.name || story.author || 'Невідомий автор';
   const authorAvatar =
-    author?.avatarUrl || story.owner.avatarUrl || '/images/avatar.webp.webp';
+    author?.avatarUrl || story.avatar || '/images/avatar.webp.webp';
 
   const isLoading = addFavMutation.isPending || removeFavMutation.isPending;
 

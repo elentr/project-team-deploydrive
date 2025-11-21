@@ -1,78 +1,108 @@
-//lib/api/serverApi.ts
+import axios from 'axios';
 
+export const serverApi = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? '',
+});
+
+import { apiClient } from './api';
+// import type { Story } from "@/types/story";
+import type { User } from '@/types/user';
 import { cookies } from 'next/headers';
-import type { AxiosResponse } from 'axios';
-import { nextServer } from '@/lib/api/api';
-import type { ApiResponse } from '@/types/api';
-import type { StoriesResponse } from '@/types/story';
-import type { TravellersPage } from '@/types/traveller';
 
-// REFRESH SESSION (SERVER)
-export const refreshSessionOnServer = async (): Promise<AxiosResponse> => {
+// === АВТЕНТИФІКАЦІЯ ===
+export const getCurrentUser = async (): Promise<User | null> => {
   const cookieStore = await cookies();
-
-  const res = await nextServer.post(
-    '/auth/refresh',
-    {},
-    {
+  try {
+    const { data } = await apiClient.get<User>('/users/me', {
       headers: {
         Cookie: cookieStore.toString(),
       },
-    }
-  );
-
-  return res;
+    });
+    return data;
+  } catch {
+    return null;
+  }
 };
 
-// STORIES — SERVER FETCH
-
-export const getAllStoriesServer = async (
-  page: number,
-  perPage: number,
-  category?: string,
-  sortOrder?: string,
-  sortBy?: string
-): Promise<ApiResponse<StoriesResponse>> => {
-  const endPoint = '/stories';
-
-  const params = {
-    page,
-    perPage,
-    filter: category ? { category } : { category: 'all' },
-    sortOrder: sortOrder || '',
-    sortBy: sortBy || '',
-  };
-
-  const cookieStore = await cookies();
-
-  const response = await nextServer.get<ApiResponse<StoriesResponse>>(
-    endPoint,
-    {
-      params,
-      headers: {
-        Cookie: cookieStore.toString(),
-      },
-    }
-  );
-
-  return response.data;
+export const checkServerSession = async (): Promise<boolean> => {
+  const user = await getCurrentUser();
+  return !!user;
 };
 
-// TRAVELERS — SERVER FETCH
+// === ІСТОРІЇ ===
+// export interface PaginatedStoriesResponse {
+//   data: Story[];
+//   totalPages: number;
+//   totalItems: number;
+//   page: number;
+//   perPage: number;
+//   hasNextPage?: boolean;
+//   hasPreviousPage?: boolean;
+// }
 
-export const getAllTravelersServer =
-  async (): Promise<TravellersPage | null> => {
-    try {
-      const response = await nextServer.get<ApiResponse<TravellersPage>>(
-        '/users',
-        {
-          params: { page: 1 },
-        }
-      );
+// interface GetStoriesParams {
+//   page?: number;
+//   perPage?: number;
+//   category?: string;
+//   authorId?: string;
+// }
 
-      return response.data.data ?? null;
-    } catch (error) {
-      console.error('Error fetching travelers (server):', error);
-      return null;
-    }
-  };
+// export const getStoriesServer = async ({
+//   page = 1,
+//   perPage = 9,
+//   category,
+//   authorId,
+// }: GetStoriesParams = {}): Promise<PaginatedStoriesResponse> => {
+//   const cookieStore = await cookies();
+
+//   const params: Record<string, string | number> = { page, perPage };
+//   if (category) params.category = category;
+//   if (authorId) params.authorId = authorId;
+
+//   const { data } = await apiClient.get<PaginatedStoriesResponse>("/stories", {
+//     params,
+//     headers: {
+//       Cookie: cookieStore.toString(),
+//     },
+//   });
+
+//   return data;
+// };
+
+// interface GetPopularParams {
+//   page?: number;
+//   limit?: number;
+// }
+
+// export const getPopularStoriesServer = async ({
+//   page = 1,
+//   limit = 3,
+// }: GetPopularParams = {}): Promise<Story[]> => {
+//   const cookieStore = await cookies();
+
+//   const { data } = await apiClient.get<{ stories: Story[] }>(
+//     "/stories/popular",
+//     {
+//       params: { page, limit },
+//       headers: {
+//         Cookie: cookieStore.toString(),
+//       },
+//     }
+//   );
+
+//   return data.stories;
+// };
+
+// export const getStoryByIdServer = async (id: string): Promise<Story | null> => {
+//   const cookieStore = await cookies();
+//   try {
+//     const { data } = await apiClient.get<Story>(`/stories/${id}`, {
+//       headers: {
+//         Cookie: cookieStore.toString(),
+//       },
+//     });
+//     return data;
+//   } catch {
+//     return null;
+//   }
+// };

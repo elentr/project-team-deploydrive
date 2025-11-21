@@ -1,11 +1,9 @@
-//components/AuthPage/LoginForm.tsx
-
 'use client';
 
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useMutation } from '@tanstack/react-query';
-import { login } from '@/lib/api/clientApi';
+import { register } from '@/lib/api/clientApi';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import toast from 'react-hot-toast';
@@ -14,36 +12,45 @@ import type { User } from '@/types/user';
 import styles from './AuthPage.module.css';
 
 const schema = Yup.object({
-  email: Yup.string().email('Некоректна пошта').required('Введіть пошту'),
+  name: Yup.string().max(32, 'Максимум 32 символи').required('Введіть ім’я'),
+  email: Yup.string()
+    .email('Некоректна пошта')
+    .max(64, 'Максимум 64 символи')
+    .required('Введіть пошту'),
   password: Yup.string()
     .min(8, 'Мінімум 8 символів')
+    .max(128, 'Максимум 128 символів')
     .required('Введіть пароль'),
 });
 
-export default function LoginForm() {
+export default function RegistrationForm() {
   const router = useRouter();
   const setUser = useAuthStore(s => s.setUser);
 
   const mutation = useMutation<
     User,
     AxiosError<{ message: string }>,
-    { email: string; password: string }
+    { name: string; email: string; password: string }
   >({
-    mutationFn: login,
+    mutationFn: register,
     onSuccess: user => {
       setUser(user);
-      toast.success(`З поверненням, ${user.name}!`);
+      toast.success(`Вітаємо, ${user.name}! 🎉`);
       router.replace('/');
     },
     onError: error => {
-      const msg = error.response?.data?.message || 'Невірна пошта або пароль';
+      const msg = error.response?.data?.message || 'Помилка реєстрації';
       toast.error(msg);
     },
   });
 
   return (
     <Formik
-      initialValues={{ email: '', password: '' }}
+      initialValues={{
+        name: '',
+        email: '',
+        password: '',
+      }}
       validationSchema={schema}
       onSubmit={(values, { setSubmitting }) => {
         mutation.mutate(values, {
@@ -53,6 +60,21 @@ export default function LoginForm() {
     >
       {({ isSubmitting, touched, errors, values }) => (
         <Form className={styles.form}>
+          <div className={styles.formInfoInput}>
+            <label className={styles.label}>Ім’я та Прізвище*</label>
+            <Field
+              name="name"
+              className={`${styles.input}
+                ${touched.name && errors.name ? styles.inputError : ''}
+                ${values.name && !errors.name ? styles.inputFilled : ''}`}
+            />
+            <ErrorMessage
+              name="name"
+              component="div"
+              className={styles.error}
+            />
+          </div>
+
           <div className={styles.formInfoInput}>
             <label className={styles.label}>Пошта*</label>
             <Field
@@ -90,7 +112,7 @@ export default function LoginForm() {
             disabled={isSubmitting || mutation.isPending}
             className={styles.submitBtn}
           >
-            {mutation.isPending ? 'Вхід...' : 'Увійти'}
+            {mutation.isPending ? 'Реєстрація...' : 'Зареєструватись'}
           </button>
         </Form>
       )}

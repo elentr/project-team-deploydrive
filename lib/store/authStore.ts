@@ -1,34 +1,34 @@
-// lib/store/authStore.ts
-
 import { create } from 'zustand';
+import { getMe } from '@/lib/api/clientApi';
 import type { User } from '@/types/user';
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  isAuthReady: boolean;
-
-  setUser: (user: User | null) => void;
+  isLoading: boolean;
+  setUser: (user: User) => void;
   logout: () => void;
-  setIsAuthReady: (v: boolean) => void;
+  init: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>(set => ({
   user: null,
   isAuthenticated: false,
-  isAuthReady: false,
+  isLoading: true,
 
-  setUser: user =>
-    set({
-      user,
-      isAuthenticated: Boolean(user),
-    }),
+  setUser: user => set({ user, isAuthenticated: true, isLoading: false }),
 
-  logout: () =>
-    set({
-      user: null,
-      isAuthenticated: false,
-    }),
+  logout: () => set({ user: null, isAuthenticated: false }),
 
-  setIsAuthReady: v => set({ isAuthReady: v }),
+  init: async () => {
+    set({ isLoading: true });
+    try {
+      const user = await getMe();
+      set({ user, isAuthenticated: true });
+    } catch {
+      set({ user: null, isAuthenticated: false });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 }));
