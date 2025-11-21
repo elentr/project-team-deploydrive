@@ -16,8 +16,8 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Беремо куки правильно — з request.cookies (це єдиний спосіб у middleware)
-  const token = request.cookies.get('token')?.value;
-  const isAuthenticated = Boolean(token);
+  const refreshToken = request.cookies.get('refreshToken')?.value;
+  const isAuthenticated = Boolean(refreshToken);
 
   // Перевірка: чи це захищений роут?
   const isProtectedRoute = protectedRoutes.some(route =>

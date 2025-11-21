@@ -1,4 +1,4 @@
-import { apiClient } from './api';
+import { apiClient } from './apiClient';
 import type { User } from '@/types/user';
 import type { PaginatedStoriesResponse, Story } from '@/types/story';
 import axios from 'axios';
@@ -6,7 +6,7 @@ import axios from 'axios';
 export const authService = {
   async getSession(): Promise<User | null> {
     try {
-      const { data } = await apiClient.get('/users/me/profile');
+      const { data } = await apiClient.get('/users/me');
       return data;
     } catch {
       return null;
@@ -15,9 +15,9 @@ export const authService = {
 };
 
 const baseURL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  process.env.API_BASE_URL ||
-  'https://travellers-node.onrender.com';
+  (process.env.NEXT_PUBLIC_API_URL ||
+    process.env.API_BASE_URL ||
+    'https://travellers-node.onrender.com') + '/api';
 
 export const clientApi = axios.create({
   baseURL,
@@ -89,3 +89,17 @@ export const updateStoryLikes = (storyId: string, qty: string) => {
 
 export type AddToFavouriteResponse = { message: string };
 export type UpdateFavoriteResponse = { data: { favoriteCount: number } };
+
+export const getCurrentUser = async () => {
+  try {
+    const res = await apiClient.get('/users/me/profile');
+
+    const raw = res.data.data;
+
+    const user = raw?.user ?? raw;
+
+    return user;
+  } catch (err) {
+    throw err;
+  }
+};

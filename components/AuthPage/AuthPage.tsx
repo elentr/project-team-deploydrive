@@ -1,10 +1,8 @@
-// components/AuthPage/AuthPage.tsx
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import { checkSession } from '@/lib/api/clientApi';
+import { useAuthStore } from '@/lib/store/authStore';
 import Link from 'next/link';
 import styles from './AuthPage.module.css';
 import LoginForm from './LoginForm';
@@ -12,27 +10,20 @@ import RegistrationForm from './RegistrationForm';
 
 export default function AuthPage({ type }: { type: 'login' | 'register' }) {
   const router = useRouter();
-
-  // Перевірка, чи вже залогінений
-  const { data: isAuthenticated, isLoading } = useQuery({
-    queryKey: ['session'],
-    queryFn: checkSession,
-    staleTime: Infinity,
-  });
+  const isAuthenticated = useAuthStore(s => s.isAuthenticated);
+  const isAuthReady = useAuthStore(s => s.isAuthReady);
 
   useEffect(() => {
-    if (isAuthenticated === true) {
-      router.replace('/');
-    }
-  }, [isAuthenticated, router]);
+    if (!isAuthReady) return;
+    if (isAuthenticated) router.replace('/');
+  }, [isAuthenticated, isAuthReady, router]);
 
-  if (isLoading) return null;
+  if (!isAuthReady) return null;
 
   return (
     <section>
       <div className="container">
         <div className={styles.authWrapper}>
-          {/* Табы */}
           <div className={styles.tabsWrapper}>
             <Link
               href="/auth/register"
@@ -48,7 +39,6 @@ export default function AuthPage({ type }: { type: 'login' | 'register' }) {
             </Link>
           </div>
 
-          {/* Заголовки */}
           {type === 'login' ? (
             <>
               <h2 className={styles.authTitle}>Вхід</h2>
@@ -63,7 +53,6 @@ export default function AuthPage({ type }: { type: 'login' | 'register' }) {
             </>
           )}
 
-          {/* Форма */}
           {type === 'login' ? <LoginForm /> : <RegistrationForm />}
         </div>
       </div>
