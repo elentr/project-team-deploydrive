@@ -87,7 +87,7 @@ export default function Header() {
               </li>
 
               <li className={styles.navItem}>
-                <Link href="/travelers" onClick={closeMenu}>
+                <Link href="/travellers" onClick={closeMenu}>
                   Мандрівники
                 </Link>
               </li>
