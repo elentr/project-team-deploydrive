@@ -3,11 +3,11 @@
 import css from './Footer.module.css';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthStoreHook } from '@/hooks/useAuthBootstrap';
 
 export default function Footer() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthStoreHook();
   const pathname = usePathname();
 
   const isAuthPage =
