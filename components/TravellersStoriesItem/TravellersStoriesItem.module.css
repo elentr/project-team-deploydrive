@@ -258,6 +258,12 @@
 
   .title {
     font-size: 26px;
+    height: 72px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;    
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
   }
 
   .description {
