@@ -227,7 +227,7 @@ export default function StoryForm({ onSuccess, onCancel }: StoryFormProps) {
             {isCategoriesLoading ? 'Завантаження...' : 'Категорія'}
           </option>
           {(categories ?? []).map(c => (
-            <option key={c._id} value={c._id}>
+            <option key={c.id} value={c.id}>
               {c.name}
             </option>
           ))}

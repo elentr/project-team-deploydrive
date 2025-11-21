@@ -1,238 +1,91 @@
-// lib/api/clientApi.ts
-'use client';
-
+import { apiClient } from './api';
 import type { User } from '@/types/user';
-import type { Traveller, TravellersPage } from '@/types/traveller';
-import type {
-  Story,
-  StoriesResponse,
-  StoryFavoriteResponse,
-  Category,
-} from '@/types/story';
-import type { ApiResponse } from '@/types/api';
+import type { PaginatedStoriesResponse, Story } from '@/types/story';
+import axios from 'axios';
 
-import { nextServer } from '@/lib/api/api';
-import { NextServer } from 'next/dist/server/next';
-
-type VerifyEmailResponse = {
-  message: string;
+export const authService = {
+  async getSession(): Promise<User | null> {
+    try {
+      const { data } = await apiClient.get('/users/me/profile');
+      return data;
+    } catch {
+      return null;
+    }
+  },
 };
 
-// AUTH TYPES
-export interface RegisterRequest {
+const baseURL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.API_BASE_URL ||
+  'https://travellers-node.onrender.com';
+
+export const clientApi = axios.create({
+  baseURL,
+  withCredentials: true,
+});
+
+clientApi.interceptors.request.use(config => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
+export const register = (data: {
   name: string;
   email: string;
   password: string;
-}
+}) => apiClient.post<User>('/auth/register', data).then(r => r.data);
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
+export const login = (data: { email: string; password: string }) =>
+  apiClient.post<User>('/auth/login', data).then(r => r.data);
 
-export interface AuthResponseData {
-  accessToken: string;
-  user: User;
-}
+export const logout = () => apiClient.post('/auth/logout');
 
-// AUTH LOGIC
-
-export const register = async (data: RegisterRequest): Promise<User> => {
-  const res = await nextServer.post<ApiResponse<AuthResponseData>>(
-    '/auth/register',
-    data
-  );
-
-  const payload = res.data.data;
-  if (!payload) throw new Error('Invalid register response');
-
-  localStorage.setItem('accessToken', payload.accessToken);
-
-  return payload.user;
-};
-
-export const login = async (data: LoginRequest): Promise<User> => {
-  const res = await nextServer.post<ApiResponse<AuthResponseData>>(
-    '/auth/login',
-    data
-  );
-
-  const payload = res.data.data;
-  if (!payload) throw new Error('Invalid login response');
-
-  localStorage.setItem('accessToken', payload.accessToken);
-
-  return payload.user;
-};
-
-export const logout = async (): Promise<void> => {
-  await nextServer.post('/auth/logout');
-  localStorage.removeItem('accessToken');
-};
-
-export const refreshSession = async (): Promise<string | null> => {
-  try {
-    const res =
-      await nextServer.post<ApiResponse<{ accessToken: string }>>(
-        '/auth/refresh'
-      );
-
-    const token = res.data.data?.accessToken;
-    if (!token) return null;
-
-    localStorage.setItem('accessToken', token);
-    return token;
-  } catch {
-    return null;
-  }
-};
+export const getMe = (): Promise<User> =>
+  apiClient.get<User>('/users/me').then(r => r.data);
 
 export const checkSession = async (): Promise<boolean> => {
   try {
-    const res = await nextServer.post('/auth/refresh');
-    const token = res.data.data?.accessToken;
-
-    if (token) {
-      localStorage.setItem('accessToken', token);
-    }
-
+    await apiClient.get('/users/me');
     return true;
   } catch {
     return false;
   }
 };
 
-// USER API
-
-export const getMe = async (): Promise<User> => {
-  const res = await nextServer.get<ApiResponse<User>>('/users/me');
-
-  if (!res.data.data) throw new Error('User not found');
-  return res.data.data;
-};
-
-// Get travellers list
-export const getAllTravelers = async (): Promise<Traveller[]> => {
-  const response = await nextServer.get<ApiResponse<TravellersPage>>('/users', {
-    params: { page: 1 },
+export const getStories = (
+  params: Record<string, string | number | undefined> = {}
+) => {
+  const sp = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v != null) sp.append(k, String(v));
   });
-
-  return response.data.data.data ?? [];
+  return apiClient
+    .get<PaginatedStoriesResponse>(`/stories${sp.toString() ? '?' + sp : ''}`)
+    .then(r => r.data);
 };
 
-export const updateUserProfile = async (formData: FormData): Promise<User> => {
-  const res = await nextServer.patch<ApiResponse<User>>('/users/me', formData);
+export const getPopularStories = (page = 1, limit = 3) =>
+  apiClient
+    .get<{ stories: Story[] }>(`/stories/popular?page=${page}&limit=${limit}`)
+    .then(r => r.data.stories);
 
-  if (!res.data.data) {
-    throw new Error('Update failed');
-  }
-
-  return res.data.data;
+export const favouriteAdd = (storyId: string) => {
+  return clientApi.post<{ message: string }>(`/favorites/${storyId}`);
 };
 
-export const sendVerifyEmail = async (newEmail: string): Promise<string> => {
-  const res = await nextServer.post<ApiResponse<VerifyEmailResponse>>(
-    '/auth/email/verify-change',
-    { email: newEmail }
-  );
-
-  return res.data.data.message;
+export const favouriteRemove = (storyId: string) => {
+  return clientApi.delete<{ message: string }>(`/favorites/${storyId}`);
 };
 
-// STORIES API
-
-export const createStory = async (formData: FormData): Promise<Story> => {
-  const res = await nextServer.post<ApiResponse<Story>>('/stories', formData);
-
-  if (!res.data.data) throw new Error('Create story failed');
-  return res.data.data;
+export const updateStoryLikes = (storyId: string, qty: string) => {
+  return clientApi.patch(`/stories/${storyId}/favorite`, { qty });
 };
 
-export const updateStory = async (
-  storyId: string,
-  formData: FormData
-): Promise<Story> => {
-  const res = await nextServer.patch<ApiResponse<Story>>(
-    `/stories/${storyId}`,
-    formData
-  );
-
-  if (!res.data.data) throw new Error('Update story failed');
-  return res.data.data;
-};
-
-export const getStory = async (storyId: string): Promise<Story> => {
-  const res = await nextServer.get<ApiResponse<Story>>(`/stories/${storyId}`);
-
-  if (!res.data.data) throw new Error('Story not found');
-  return res.data.data;
-};
-
-export const getAllStories = async (
-  page: number,
-  perPage: number,
-  category?: string,
-  sortOrder?: string,
-  sortBy?: string
-): Promise<ApiResponse<StoriesResponse>> => {
-  const response = await nextServer.get<ApiResponse<StoriesResponse>>(
-    '/stories',
-    {
-      params: {
-        page,
-        perPage,
-        filter: category ? { category } : { category: 'ALL' },
-        sortOrder: sortOrder || '',
-        sortBy: sortBy || '',
-      },
-    }
-  );
-
-  return response.data;
-};
-
-// CATEGORIES
-export const getCategories = async (): Promise<Category[]> => {
-  const res = await nextServer.get<ApiResponse<Category[]>>('/categories');
-  return res.data.data ?? [];
-};
-
-export const getCurrentUser = async (): Promise<User> => {
-  const res = await nextServer.get<ApiResponse<User>>('/users/me');
-  return res.data.data as User;
-};
-
-// Добавить историю в избранное
-export const addStoryToSave = async (storyId: string) => {
-  const response = await nextServer.post(`/users/me/saved/${storyId}`);
-  return response.data;
-};
-
-// Удалить историю из избранного
-export const removeStoryFromSave = async (storyId: string) => {
-  const response = await nextServer.delete(`/users/me/saved/${storyId}`);
-  return response.data;
-};
-
-// Добавить историю в избранное
-export async function favouriteAdd(storyId: string): Promise<Story> {
-  const r = await nextServer.post(`/stories/${storyId}/favorite`);
-  return r.data.data.story;
-}
-
-// Убрать историю из избранного
-export async function favouriteRemove(storyId: string): Promise<Story> {
-  const r = await nextServer.delete(`/stories/${storyId}/favorite`);
-  return r.data.data.story;
-}
-
-// Обновить количество лайков (используется в UI)
-export async function updateStoryLikes(
-  storyId: string,
-  likes: string
-): Promise<Story> {
-  const r = await nextServer.patch(`/stories/${storyId}/likes`, {
-    favoriteCount: likes,
-  });
-  return r.data.data;
-}
+export type AddToFavouriteResponse = { message: string };
+export type UpdateFavoriteResponse = { data: { favoriteCount: number } };
