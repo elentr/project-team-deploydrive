@@ -2,6 +2,8 @@ import StoriesClient from '@/components/StoriesPage/StoriesPage';
 import { mapStory } from '@/types/story';
 import css from './Page.module.css';
 
+export const dynamic = 'force-dynamic';
+
 async function getInitialStories(category: string) {
   try {
     const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/stories`);
