@@ -3,7 +3,7 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useMutation } from '@tanstack/react-query';
-import { login } from '@/lib/api/clientApi';
+import { login } from '@/lib/api/auth';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import toast from 'react-hot-toast';
